@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { getStorage, ref, uploadString } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,14 +16,21 @@ const PostForm = () => {
 
   const { mutate } = useMutation({
     mutationKey: ['formData'],
-    mutationFn: ({ title, content, postingDate, userEmail, postId }) =>
+    mutationFn: ({ title, content, postingDate, userEmail, postId, imageURL }) =>
       axios.post('https://react-blog-cf942-default-rtdb.firebaseio.com/posts.json', {
         title,
         content,
         postingDate,
         userEmail,
         postId,
+        imageURL,
       }),
+    // onSuccess : 작성 후 바로 리렌더링 되게 추가하기
+    // queryClient.invalidateQueries(['posts']); <- queryClient 따로 빼서 import 해야 함ㄴ
+    // navigator('/');
+
+    // 글 상세보기에 작성자도 추가?
+    // content는 input말고 textarea
   });
 
   const handleWritePost = async e => {
@@ -34,6 +41,8 @@ const PostForm = () => {
     const fileRef = ref(storage, uuidv4());
     await uploadString(fileRef, attachment, 'data_url');
 
+    const imageURL = await getDownloadURL(fileRef);
+
     // 날짜
     const date = getPostingDate();
 
@@ -43,10 +52,9 @@ const PostForm = () => {
     const userEmail = 'aaa@abc.kr'; // 임시
     const postId = uuidv4();
 
-    mutate({ title, content, postingDate, userEmail, postId });
+    mutate({ title, content, postingDate, userEmail, postId, imageURL });
 
     setAttachment('');
-    navigator('/');
   };
 
   const handleFileChange = e => {
@@ -70,7 +78,7 @@ const PostForm = () => {
     const month = ('0' + (today.getMonth() + 1)).slice(-2);
     const day = ('0' + today.getDate()).slice(-2);
 
-    return year + '년' + month + '월' + day + '일';
+    return year + '년 ' + month + '월 ' + day + '일';
   };
 
   return (

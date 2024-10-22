@@ -5,26 +5,40 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 const PostList = () => {
-  const { data } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
-    queryFn: () => axios.get('https://react-blog-cf942-default-rtdb.firebaseio.com/posts'),
+    queryFn: async () => {
+      const response = await axios.get('https://react-blog-cf942-default-rtdb.firebaseio.com/posts.json');
+      return response.data;
+    },
   });
-
-  // await 사용하기
-
-  console.log(data);
 
   let content;
 
-  if (!data) {
+  if (isLoading) {
+    content = <p>로딩 중...</p>;
+  }
+
+  if (error) {
+    content = (
+      <>
+        <p>오류가 발생했습니다.</p>
+        <p> {error.message}</p>
+      </>
+    );
+  }
+
+  if (!data || Object.keys(data).length === 0) {
     content = <p>현재 포스트가 없습니다.</p>;
   }
 
   if (data) {
+    const posts = Object.values(data);
+
     content = (
       <PostListWrapper>
-        {data.map(post => (
-          <PostCard post={post} />
+        {posts.map(post => (
+          <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
     );

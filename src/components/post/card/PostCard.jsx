@@ -6,13 +6,13 @@ const PostCard = ({ post }) => {
   return (
     <PostBox>
       <Link to={`/posts/${post.postId}`}>
-        <ImgBox src="" alt="" />
+        <ImgBox src={post.imageURL} alt="" />
       </Link>
       <div>
         <br />
-        <h2>title</h2>
+        <h2>{post.title}</h2>
         <br />
-        <p>dateL 2021 </p>
+        <p>{post.postingDate} </p>
       </div>
     </PostBox>
   );
