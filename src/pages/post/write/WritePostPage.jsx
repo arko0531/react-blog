@@ -1,7 +1,8 @@
 import React from 'react';
+import PostForm from '../../../components/form/PostForm';
 
 const WritePostPage = () => {
-  return <div>WritePostPage</div>;
+  return <PostForm />;
 };
 
 export default WritePostPage;
