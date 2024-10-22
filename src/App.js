@@ -1,11 +1,13 @@
 import './App.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Sidebar from './components/sidebar/SideBar';
+import Sidebar from './components/sidebar/Sidebar';
 import MainPostPage from './pages/main/Index';
 import DetailPostPage from './pages/post/DetailPostPage';
 import EditPostPage from './pages/post/edit/EditPostPage';
 import WritePostPage from './pages/post/write/WritePostPage';
 import AuthenticationPage from './pages/auth/AuthenticationPage';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { app } from './firebase';
 
 function App() {
   const router = createBrowserRouter([
@@ -27,7 +29,13 @@ function App() {
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  const queryClient = new QueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

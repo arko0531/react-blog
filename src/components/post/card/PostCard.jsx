@@ -1,10 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 
-const PostCard = () => {
+const PostCard = ({ post }) => {
   return (
     <PostBox>
-      <ImgBox src="" alt="" />
+      <Link to={`/posts/${post.postId}`}>
+        <ImgBox src="" alt="" />
+      </Link>
       <div>
         <br />
         <h2>title</h2>
@@ -18,19 +21,25 @@ const PostCard = () => {
 export default PostCard;
 
 const PostBox = styled.div`
+  display: flex;
+  flex-direction: column;
   padding: 10px;
   width: 370px;
-  height: 300px;
   border-top: 2px solid #0554f2;
   border-bottom: 2px solid #0554f2;
+  height: 500px;
+  gap: 10px;
 
   h2 {
-    font-size: 18px;
+    font-size: 23px;
     font-weight: 500;
+  }
+  p {
+    margin-top: 4px;
   }
 `;
 
 const ImgBox = styled.img`
-  height: 200px;
+  height: 300px;
   width: 100%;
 `;
