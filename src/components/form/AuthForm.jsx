@@ -8,10 +8,12 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } f
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { isLoginActions } from '../../store/reducers/login';
+import { useSearchParams } from 'react-router-dom';
 
 const AuthForm = () => {
-  const isLogin = useSelector(state => state.isLogin.isLogin);
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const isLogin = searchParams.get('mode');
 
   const navigate = useNavigate();
 
@@ -21,7 +23,7 @@ const AuthForm = () => {
       axios.post('https://react-blog-cf942-default-rtdb.firebaseio.com/users.json', { name, password, email }),
     onSuccess: () => {
       dispatch(isLoginActions.login());
-      navigate('/auth');
+      navigate('/auth?mode=login');
     },
   });
 
@@ -82,7 +84,7 @@ const AuthForm = () => {
   };
 
   const handleRegister = () => {
-    // mode
+    navigate('/auth?mode=register');
   };
 
   // async function handleAuth(event) {
@@ -105,7 +107,7 @@ const AuthForm = () => {
   return (
     <>
       <StyledAuthForm id="authForm" onSubmit={handleAuth}>
-        <AuthTitle>{!isLogin ? 'Login' : 'SignUp'}</AuthTitle>
+        <AuthTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</AuthTitle>
         <Input label="E-mail" type="email" id="email" width="400" placeholder="이메일을 입력해주세요." required />
         <Input
           label="Password"
@@ -115,7 +117,7 @@ const AuthForm = () => {
           placeholder="비밀번호를 입력해 주세요."
           required
         />
-        {isLogin && (
+        {isLogin !== 'login' && (
           <>
             <Input
               label="Password 확인"
@@ -129,10 +131,12 @@ const AuthForm = () => {
           </>
         )}
         <ButtonWrapper>
-          <Button type="submit">{!isLogin ? 'Login' : 'SignUp'}</Button>
-          <Button type="button" onClick={handleRegister} $bgColor="white">
-            register
-          </Button>
+          <Button type="submit">{isLogin === 'login' ? 'Login' : 'SignUp'}</Button>
+          {isLogin === 'login' && (
+            <Button type="button" onClick={handleRegister} $bgColor="white">
+              register
+            </Button>
+          )}
         </ButtonWrapper>
       </StyledAuthForm>
     </>

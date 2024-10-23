@@ -23,7 +23,7 @@ const Navigator = () => {
   return (
     <Nav>
       <NavText to="/">Home</NavText>
-      {!isLogin && <NavText to="/auth">Login</NavText>}
+      {!isLogin && <NavText to="/auth?mode=login">Login</NavText>}
       {isLogin && <LogoutButton onClick={logoutHandler}>Logout</LogoutButton>}
     </Nav>
   );

@@ -15,7 +15,8 @@ const DetailPostPage = () => {
     queryKey: ['posts', params.postId],
     queryFn: async () => {
       const response = await axios.get(
-        `https://react-blog-cf942-default-rtdb.firebaseio.com/posts/${params.postId}.json`, // postId 대신 파이어베이스 고유키 가져오기
+        // `https://react-blog-cf942-default-rtdb.firebaseio.com/posts/${params.postId}.json`, // postId 대신 파이어베이스 고유키 가져오기
+        `https://react-blog-cf942-default-rtdb.firebaseio.com/posts.json`, // postId 대신 파이어베이스 고유키 가져오기
       );
       return response.data;
     },
