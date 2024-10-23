@@ -5,47 +5,78 @@ import Button from '../ui/Button';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useState } from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
 
 const AuthForm = () => {
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [isLogin, setIsLogin] = useState(false);
 
-  // 임시
-  const isLogin = !true;
+  const navigate = useNavigate();
 
   const { mutate } = useMutation({
     mutationKey: ['formData'],
     mutationFn: ({ name, email, password }) =>
       axios.post('https://react-blog-cf942-default-rtdb.firebaseio.com/users.json', { name, password, email }),
+    onSuccess: () => {
+      setIsLogin(true);
+      navigate('/auth');
+    },
   });
+
+  async function register(email, password) {
+    try {
+      const auth = getAuth();
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+
+      console.log(user);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async function login(email, password) {
+    const auth = getAuth();
+    try {
+      const user = await signInWithEmailAndPassword(auth, email, password);
+
+      console.log(user);
+
+      navigate('/');
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   const handleAuth = async e => {
     e.preventDefault();
 
-    const passCheck = passwordCheck();
-
-    if (passCheck) {
+    // 회원 가입
+    if (!isLogin) {
       const name = e.target.name.value;
       const email = e.target.email.value;
       const password = e.target.password.value;
+      const passwordConfirm = e.target.passwordCheck.value;
+
+      if (password.length <= 6 && passwordConfirm.length <= 6) {
+        alert('비밀번호를 6자리 이상으로 설정해주세요.');
+        return;
+      }
+      if (password !== passwordConfirm) {
+        alert('비밀번호가 일치하지 않습니다.');
+        return;
+      }
 
       mutate({ name, email, password });
+      register(email, password);
     }
-  };
 
-  const passwordCheck = () => {
-    if (password !== passwordConfirm) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return false;
-    } else return true;
-  };
+    // 로그인
+    if (isLogin) {
+      const email = e.target.email.value;
+      const password = e.target.password.value;
 
-  const handleChangePassword = e => {
-    setPassword(e.target.value);
-  };
-
-  const handleChangePasswordConfirm = e => {
-    setPasswordConfirm(e.target.value);
+      login(email, password);
+    }
   };
 
   // async function handleAuth(event) {
@@ -76,7 +107,6 @@ const AuthForm = () => {
           type="password"
           width="400"
           placeholder="비밀번호를 입력해 주세요."
-          onChange={handleChangePassword}
           required
         />
         {!isLogin && (
@@ -87,7 +117,6 @@ const AuthForm = () => {
               type="password"
               width="400"
               placeholder="비밀번호를 다시 입력해 주세요."
-              onChange={handleChangePasswordConfirm}
               required
             />
             <Input label="Name" type="text" id="name" width="400" placeholder="이름을 입력해 주세요." required />
