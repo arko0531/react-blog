@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
+import { queryClient } from '../../util/http';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
@@ -25,12 +26,10 @@ const PostForm = () => {
         postId,
         imageURL,
       }),
-    // onSuccess : 작성 후 바로 리렌더링 되게 추가하기
-    // queryClient.invalidateQueries(['posts']); <- queryClient 따로 빼서 import 해야 함ㄴ
-    // navigator('/');
-
-    // 글 상세보기에 작성자도 추가?
-    // content는 input말고 textarea
+    onSuccess: () => {
+      queryClient.invalidateQueries(['posts']);
+      navigator('/');
+    },
   });
 
   const handleWritePost = async e => {
@@ -87,7 +86,7 @@ const PostForm = () => {
         <PostTitle>새 게시글 작성</PostTitle>
 
         <Input label="제목" type="text" id="title" width="700" placeholder="제목을 입력해주세요." required />
-        <Input
+        <TextArea
           label="내용"
           type="text"
           id="content"
@@ -139,4 +138,10 @@ const ButtonWrapper = styled.div`
   margin-top: 40px;
 `;
 
-// 날짜는 자동 입력
+const TextArea = styled.textarea`
+  padding: 10px;
+  margin-top: 20px;
+
+  width: ${({ width }) => (width ? `${width}px` : '400px')};
+  height: ${({ height }) => (height ? `${height}px` : '40px')};
+`;

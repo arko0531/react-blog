@@ -12,7 +12,7 @@ const Button = ({ type, onClick, children, ...props }) => {
 export default Button;
 
 const StyledButton = styled.button`
-  background-color: ${({ $bgColor }) => ($bgColor ? '#2463e1' : '#ffdd1ef9')};
+  background-color: ${({ $bgColor }) => ($bgColor ? $bgColor : '#ffdd1ef9')};
   width: ${({ width }) => (width ? `${width}px` : '100px')};
   color: ${({ color }) => (color ? `${color}` : 'black')};
   border-radius: 10px;

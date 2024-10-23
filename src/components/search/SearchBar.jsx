@@ -6,7 +6,7 @@ const SearchBar = () => {
   return (
     <Search>
       <SearchInput />
-      <Button width="60" $bgColor="blue" color="white">
+      <Button width="60" $bgColor="#2463e1" color="white">
         검색
       </Button>
     </Search>

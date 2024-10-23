@@ -7,13 +7,14 @@ const PostCard = ({ post }) => {
     <PostBox>
       <Link to={`/posts/${post.postId}`}>
         <ImgBox src={post.imageURL} alt="" />
+
+        <div>
+          <br />
+          <h2>{post.title}</h2>
+          <br />
+          <p>{post.postingDate} </p>
+        </div>
       </Link>
-      <div>
-        <br />
-        <h2>{post.title}</h2>
-        <br />
-        <p>{post.postingDate} </p>
-      </div>
     </PostBox>
   );
 };
@@ -27,7 +28,7 @@ const PostBox = styled.div`
   width: 370px;
   border-top: 2px solid #0554f2;
   border-bottom: 2px solid #0554f2;
-  height: 500px;
+  height: 450px;
   gap: 10px;
 
   h2 {
