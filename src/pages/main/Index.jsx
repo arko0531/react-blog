@@ -3,9 +3,11 @@ import PostList from '../../components/post/PostList';
 import Button from '../../components/ui/Button';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const MainPostPage = () => {
   const navigate = useNavigate();
+  const isLogin = useSelector(state => state.isLogin.isLogin);
 
   const handleWritePost = () => {
     navigate('/posts/new');
@@ -13,9 +15,7 @@ const MainPostPage = () => {
 
   return (
     <>
-      <ButtonWrapper>
-        <Button onClick={handleWritePost}>New</Button>
-      </ButtonWrapper>
+      <ButtonWrapper>{isLogin && <Button onClick={handleWritePost}>New</Button>}</ButtonWrapper>
 
       <PostList />
     </>

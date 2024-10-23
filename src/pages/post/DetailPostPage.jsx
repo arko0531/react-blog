@@ -4,10 +4,12 @@ import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const DetailPostPage = () => {
   const navigate = useNavigate();
   const params = useParams();
+  const isLogin = useSelector(state => state.isLogin.isLogin);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', params.postId],
@@ -64,10 +66,13 @@ const DetailPostPage = () => {
 
   return (
     <>
-      {' '}
       <ButtonWrapper>
-        <Button onClick={handleEdit}>Edit</Button>
-        <Button onClick={handleDelete}>Delete</Button>
+        {isLogin && (
+          <>
+            <Button onClick={handleEdit}>Edit</Button>
+            <Button onClick={handleDelete}>Delete</Button>
+          </>
+        )}
       </ButtonWrapper>
       {content}
     </>

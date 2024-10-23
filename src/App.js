@@ -6,7 +6,8 @@ import DetailPostPage from './pages/post/DetailPostPage';
 import EditPostPage from './pages/post/edit/EditPostPage';
 import WritePostPage from './pages/post/write/WritePostPage';
 import AuthenticationPage from './pages/auth/AuthenticationPage';
-import LogoutPage from './pages/auth/LogoutPage';
+import { Provider } from 'react-redux';
+import store from './store';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './util/http';
 import { app } from './firebase';
@@ -32,9 +33,11 @@ function App() {
   ]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </Provider>
   );
 }
 

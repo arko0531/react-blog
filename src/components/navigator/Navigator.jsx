@@ -1,22 +1,30 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { getAuth } from 'firebase/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { isLoginActions } from '../../store/reducers/login';
 
 const Navigator = () => {
+  const isLogin = useSelector(state => state.isLogin.isLogin);
+  const dispatch = useDispatch();
+
   const auth = getAuth();
   const user = auth.currentUser;
 
   const logoutHandler = () => {
     auth.signOut();
-    console.log(user);
+
+    dispatch(isLoginActions.logout());
+    alert('로그아웃 되었습니다.');
   };
+  console.log(user);
 
   return (
     <Nav>
       <NavText to="/">Home</NavText>
-      {!user && <NavText to="/auth">Login</NavText>}
-      {user && <LogoutButton onClick={logoutHandler}>Logout</LogoutButton>}
+      {!isLogin && <NavText to="/auth">Login</NavText>}
+      {isLogin && <LogoutButton onClick={logoutHandler}>Logout</LogoutButton>}
     </Nav>
   );
 };

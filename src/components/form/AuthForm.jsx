@@ -4,12 +4,14 @@ import styled from 'styled-components';
 import Button from '../ui/Button';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useState } from 'react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { isLoginActions } from '../../store/reducers/login';
 
 const AuthForm = () => {
-  const [isLogin, setIsLogin] = useState(false);
+  const isLogin = useSelector(state => state.isLogin.isLogin);
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -18,7 +20,7 @@ const AuthForm = () => {
     mutationFn: ({ name, email, password }) =>
       axios.post('https://react-blog-cf942-default-rtdb.firebaseio.com/users.json', { name, password, email }),
     onSuccess: () => {
-      setIsLogin(true);
+      dispatch(isLoginActions.login());
       navigate('/auth');
     },
   });
@@ -57,7 +59,7 @@ const AuthForm = () => {
       const password = e.target.password.value;
       const passwordConfirm = e.target.passwordCheck.value;
 
-      if (password.length <= 6 && passwordConfirm.length <= 6) {
+      if (password.length < 6 && passwordConfirm.length < 6) {
         alert('비밀번호를 6자리 이상으로 설정해주세요.');
         return;
       }
@@ -77,6 +79,10 @@ const AuthForm = () => {
 
       login(email, password);
     }
+  };
+
+  const handleRegister = () => {
+    // mode
   };
 
   // async function handleAuth(event) {
@@ -99,7 +105,7 @@ const AuthForm = () => {
   return (
     <>
       <StyledAuthForm id="authForm" onSubmit={handleAuth}>
-        <AuthTitle>{isLogin ? 'Login' : 'SignUp'}</AuthTitle>
+        <AuthTitle>{!isLogin ? 'Login' : 'SignUp'}</AuthTitle>
         <Input label="E-mail" type="email" id="email" width="400" placeholder="이메일을 입력해주세요." required />
         <Input
           label="Password"
@@ -109,7 +115,7 @@ const AuthForm = () => {
           placeholder="비밀번호를 입력해 주세요."
           required
         />
-        {!isLogin && (
+        {isLogin && (
           <>
             <Input
               label="Password 확인"
@@ -123,12 +129,17 @@ const AuthForm = () => {
           </>
         )}
         <ButtonWrapper>
-          <Button type="submit">{isLogin ? 'Login' : 'SignUp'}</Button>
+          <Button type="submit">{!isLogin ? 'Login' : 'SignUp'}</Button>
+          <Button type="button" onClick={handleRegister} $bgColor="white">
+            register
+          </Button>
         </ButtonWrapper>
       </StyledAuthForm>
     </>
   );
 };
+
+// mode로 바꿔야함
 
 export default AuthForm;
 
@@ -161,5 +172,7 @@ const StyledAuthForm = styled.form`
 `;
 
 const ButtonWrapper = styled.div`
+  display: flex;
   margin-top: 40px;
+  gap: 10px;
 `;
