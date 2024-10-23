@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 const DetailPostPage = () => {
   const navigate = useNavigate();
   const params = useParams();
-  const isLogin = useSelector(state => state.isLogin.isLogin);
+  const isLogin = useSelector(state => state.auth.isLogin);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', params.postId],

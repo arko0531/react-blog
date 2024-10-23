@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 
 const MainPostPage = () => {
   const navigate = useNavigate();
-  const isLogin = useSelector(state => state.isLogin.isLogin);
+  const isLogin = useSelector(state => state.auth.isLogin);
 
   const handleWritePost = () => {
     navigate('/posts/new');

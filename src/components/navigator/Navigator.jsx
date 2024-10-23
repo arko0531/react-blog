@@ -1,30 +1,32 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { getAuth } from 'firebase/auth';
-import { useDispatch, useSelector } from 'react-redux';
-import { isLoginActions } from '../../store/reducers/login';
+import { signOut } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../../firebase';
+import { useSelector } from 'react-redux';
 
 const Navigator = () => {
-  const isLogin = useSelector(state => state.isLogin.isLogin);
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isLogin = useSelector(state => state.auth.isLogin);
 
-  const auth = getAuth();
-  const user = auth.currentUser;
-
-  const logoutHandler = () => {
-    auth.signOut();
-
-    dispatch(isLoginActions.logout());
-    alert('로그아웃 되었습니다.');
+  const handleLoginout = async () => {
+    try {
+      await signOut(auth);
+      navigate('/');
+    } catch (error) {
+      alert('로그아웃 실패');
+    }
   };
-  console.log(user);
 
   return (
     <Nav>
       <NavText to="/">Home</NavText>
-      {!isLogin && <NavText to="/auth?mode=login">Login</NavText>}
-      {isLogin && <LogoutButton onClick={logoutHandler}>Logout</LogoutButton>}
+      {!isLogin ? (
+        <NavText to="/auth?mode=login">Login</NavText>
+      ) : (
+        <LogoutButton onClick={handleLoginout}>Logout</LogoutButton>
+      )}
     </Nav>
   );
 };

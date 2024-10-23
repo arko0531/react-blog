@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 import Navigator from '../navigator/Navigator';
 import SearchBar from '../search/SearchBar';
+import { useDispatch } from 'react-redux';
+import { onAuthStateChanged } from 'firebase/auth';
+import { authActions } from '../../store/reducers/auth';
+import { auth } from '../../firebase';
 
 const SideBar = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const isLogin = onAuthStateChanged(auth, user => {
+      if (user) {
+        dispatch(authActions.login());
+        //console.log(user);
+      } else {
+        dispatch(authActions.logout());
+      }
+    });
+
+    return () => isLogin();
+  }, [dispatch]);
+
   return (
     <Main>
       <Side>
