@@ -2,14 +2,19 @@ import React from 'react';
 import PostCard from './card/PostCard';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 const PostList = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const response = await axios.get('https://react-blog-cf942-default-rtdb.firebaseio.com/posts.json');
-      return response.data;
+      const querySnapshot = await getDocs(collection(db, 'posts'));
+      const posts = {};
+      querySnapshot.forEach(doc => {
+        posts[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      return posts;
     },
   });
 

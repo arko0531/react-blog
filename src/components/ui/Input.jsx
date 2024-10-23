@@ -4,23 +4,23 @@ import styled from 'styled-components';
 const Input = ({ formMargin, label, id, ...props }) => {
   return (
     <FormInputWrapper formMargin={formMargin}>
-      <AuthLabel htmlFor={id}>{label}</AuthLabel>
-      <AuthInput id={id} name={id} {...props} />
+      <FormLabel htmlFor={id}>{label}</FormLabel>
+      <FormInput id={id} name={id} {...props} />
     </FormInputWrapper>
   );
 };
 
 export default Input;
 
-const AuthLabel = styled.label`
+const FormLabel = styled.label`
   font-size: 18px;
 `;
 
-const AuthInput = styled.input`
+const FormInput = styled.input`
   padding: 10px;
 
-  width: ${({ width }) => (width ? `${width}px` : '400px')};
-  height: ${({ height }) => (height ? `${height}px` : '40px')};
+  width: ${({ width }) => (width ? `${width}` : '400px')};
+  height: ${({ height }) => (height ? `${height}` : '40px')};
 `;
 
 const FormInputWrapper = styled.div`

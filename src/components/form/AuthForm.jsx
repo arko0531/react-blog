@@ -72,12 +72,12 @@ const AuthForm = () => {
     <>
       <StyledAuthForm id="authForm" onSubmit={handleAuth}>
         <AuthTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</AuthTitle>
-        <Input label="E-mail" type="email" id="email" width="400" placeholder="이메일을 입력해주세요." required />
+        <Input label="E-mail" type="email" id="email" width="400px" placeholder="이메일을 입력해주세요." required />
         <Input
           label="Password"
           id="password"
           type="password"
-          width="400"
+          width="400px"
           placeholder="비밀번호를 입력해 주세요."
           required
         />
@@ -87,11 +87,11 @@ const AuthForm = () => {
               label="Password 확인"
               id="passwordCheck"
               type="password"
-              width="400"
+              width="400px"
               placeholder="비밀번호를 다시 입력해 주세요."
               required
             />
-            <Input label="Name" type="text" id="name" width="400" placeholder="이름을 입력해 주세요." required />
+            <Input label="Name" type="text" id="name" width="400px" placeholder="이름을 입력해 주세요." required />
           </>
         )}
         <ButtonWrapper>

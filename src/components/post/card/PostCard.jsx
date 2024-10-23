@@ -6,7 +6,7 @@ const PostCard = ({ post }) => {
   return (
     <PostBox>
       <Link to={`/posts/${post.postId}`}>
-        <ImgBox src={post.imageURL} alt="" />
+        <ImgBox src={post.imageURL} alt="post image" />
 
         <div>
           <br />
@@ -24,12 +24,15 @@ export default PostCard;
 const PostBox = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 10px 16px;
   width: 370px;
   border-top: 2px solid #0554f2;
   border-bottom: 2px solid #0554f2;
   height: 450px;
   gap: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   h2 {
     font-size: 23px;

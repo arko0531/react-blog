@@ -2,13 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
-import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { queryClient } from '../../util/http';
+import { doc, setDoc } from 'firebase/firestore';
+import { db, auth } from '../../firebase';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
@@ -17,15 +18,16 @@ const PostForm = () => {
 
   const { mutate } = useMutation({
     mutationKey: ['formData'],
-    mutationFn: ({ title, content, postingDate, userEmail, postId, imageURL }) =>
-      axios.post('https://react-blog-cf942-default-rtdb.firebaseio.com/posts.json', {
+    mutationFn: async ({ title, content, postingDate, userEmail, postId, imageURL }) => {
+      await setDoc(doc(db, 'posts', postId), {
         title,
         content,
         postingDate,
         userEmail,
         postId,
         imageURL,
-      }),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']);
       navigator('/');
@@ -34,6 +36,7 @@ const PostForm = () => {
 
   const handleWritePost = async e => {
     e.preventDefault();
+    const user = auth.currentUser;
 
     // 파일
     const storage = getStorage();
@@ -48,7 +51,7 @@ const PostForm = () => {
     const title = e.target.title.value;
     const content = e.target.content.value;
     const postingDate = date;
-    const userEmail = 'aaa@abc.kr'; // 임시
+    const userEmail = user.email;
     const postId = uuidv4();
 
     mutate({ title, content, postingDate, userEmail, postId, imageURL });
@@ -85,21 +88,22 @@ const PostForm = () => {
       <StyledPostForm onSubmit={handleWritePost}>
         <PostTitle>새 게시글 작성</PostTitle>
 
-        <Input label="제목" type="text" id="title" width="700" placeholder="제목을 입력해주세요." required />
+        <Input label="제목" type="text" id="title" width="100%" placeholder="제목을 입력해주세요." required />
         <TextArea
           label="내용"
           type="text"
           id="content"
-          width="700"
-          height="300"
+          width="100%"
+          height="400px"
           placeholder="내용을 입력해주세요."
           required
         />
+
         <Input
           label="이미지"
           type="file"
           id="image"
-          width="600"
+          width="40%"
           placeholder="제목을 입력해주세요."
           accept="image/*"
           onChange={handleFileChange}
@@ -117,31 +121,37 @@ const PostForm = () => {
 export default PostForm;
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 1200px;
+  margin: 60px auto;
+  padding: 30px 80px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const StyledPostForm = styled.form`
   display: flex;
   flex-direction: column;
-  width: 80%;
+  width: 100%;
 `;
 
 const PostTitle = styled.p`
   font-size: 30px;
   font-weight: 500;
   margin-bottom: 50px;
+  text-align: center;
 `;
 
 const ButtonWrapper = styled.div`
+  display: flex;
   margin-top: 40px;
+  justify-content: flex-end;
 `;
 
 const TextArea = styled.textarea`
   padding: 10px;
   margin-top: 20px;
 
-  width: ${({ width }) => (width ? `${width}px` : '400px')};
-  height: ${({ height }) => (height ? `${height}px` : '40px')};
+  width: ${({ width }) => (width ? `${width}` : '400px')};
+  height: ${({ height }) => (height ? `${height}` : '40px')};
 `;
