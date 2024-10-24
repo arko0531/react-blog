@@ -25,6 +25,7 @@ const Navigator = () => {
 
   const handleResetSearchResult = () => {
     dispatch(postsActions.handleSearchPostsResult(null));
+    dispatch(postsActions.hadleFoundSerchResult(true));
   };
 
   return (

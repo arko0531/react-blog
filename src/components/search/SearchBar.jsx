@@ -6,10 +6,12 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useDispatch } from 'react-redux';
 import { postsActions } from '../../store/reducers/posts';
+import { useNavigate } from 'react-router-dom';
 
 const SearchBar = () => {
   const [search, setSearch] = useState('');
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // 검색 쿼리 실행
   const { data } = useQuery({
@@ -42,6 +44,7 @@ const SearchBar = () => {
       dispatch(postsActions.handleSearchPostsResult(null));
       dispatch(postsActions.hadleFoundSerchResult(true));
     }
+    navigate('/?mode=search');
   };
 
   useEffect(() => {
