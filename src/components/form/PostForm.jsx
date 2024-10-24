@@ -125,26 +125,21 @@ const PostForm = () => {
           placeholder="제목을 입력해주세요."
           required
         />
-        <TextArea
-          label="내용"
-          type="text"
-          id="content"
-          width="100%"
-          height="400px"
-          placeholder="내용을 입력해주세요."
-          defaultValue={postData?.content || ''}
-          required
-        />
+        <TextAreaWrapper>
+          <TextLabel>내용</TextLabel>
+          <TextArea
+            label="내용"
+            type="text"
+            id="content"
+            width="100%"
+            height="400px"
+            placeholder="내용을 입력해주세요."
+            defaultValue={postData?.content || ''}
+            required
+          />
+        </TextAreaWrapper>
 
-        <Input
-          label="이미지"
-          type="file"
-          id="image"
-          width="40%"
-          accept="image/*"
-          onChange={handleFileChange}
-          required
-        />
+        <Input type="file" id="image" width="40%" accept="image/*" onChange={handleFileChange} required />
 
         <ButtonWrapper>
           <Button type="submit"> 작성</Button>
@@ -186,8 +181,18 @@ const ButtonWrapper = styled.div`
 
 const TextArea = styled.textarea`
   padding: 10px;
-  margin-top: 20px;
 
   width: ${({ width }) => (width ? `${width}` : '400px')};
   height: ${({ height }) => (height ? `${height}` : '40px')};
+`;
+
+const TextLabel = styled.label`
+  font-size: 18px;
+  margin-top: 20px;
+`;
+
+const TextAreaWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 `;

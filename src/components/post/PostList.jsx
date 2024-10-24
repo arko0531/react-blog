@@ -2,7 +2,7 @@ import React from 'react';
 import PostCard from './card/PostCard';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs, orderBy } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 const PostList = () => {
@@ -58,7 +58,7 @@ export default PostList;
 const PostListWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  gap: 40px;
+  gap: 70px;
   flex-grow: 1;
   justify-content: start;
   flex-flow: row wrap;

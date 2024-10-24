@@ -21,9 +21,10 @@ const StyledButton = styled.button`
   border: none;
   text-align: center;
   font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ bgColor }) => (bgColor ? '#4e7cd6' : '#ffe554f8')};
+    background-color: ${({ $bgColor }) => (!$bgColor || 'white' ? '#ffe554f8' : '#4e7cd6')};
   }
 `;

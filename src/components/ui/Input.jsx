@@ -26,7 +26,6 @@ const FormInput = styled.input`
 const FormInputWrapper = styled.div`
   display: flex;
   flex-direction: column;
-
   margin-top: 20px;
   gap: 10px;
 `;

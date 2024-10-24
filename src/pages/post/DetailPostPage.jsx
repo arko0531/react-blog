@@ -89,7 +89,7 @@ const DetailPostPage = () => {
             <Button width="70" onClick={handleEdit}>
               Edit
             </Button>
-            <Button width="70" $bgColor="#f9f9f9" onClick={openModal}>
+            <Button width="70" $bgColor="white" onClick={openModal}>
               Delete
             </Button>
           </>
