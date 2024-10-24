@@ -18,6 +18,8 @@ const FormLabel = styled.label`
 
 const FormInput = styled.input`
   padding: 10px;
+  border: none;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
 
   width: ${({ width }) => (width ? `${width}` : '400px')};
   height: ${({ height }) => (height ? `${height}` : '40px')};

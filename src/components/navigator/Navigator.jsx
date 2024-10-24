@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
@@ -10,7 +10,6 @@ const Navigator = () => {
   const navigate = useNavigate();
   const isLogin = useSelector(state => state.auth.isLogin);
 
-  useEffect(() => {});
   const user = auth.currentUser;
 
   const handleLogout = async () => {

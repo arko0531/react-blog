@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { auth, db } from '../../firebase';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
 import Modal from '../../components/modal/Modal';
 
@@ -15,6 +15,7 @@ const DetailPostPage = () => {
   const navigate = useNavigate();
   const params = useParams();
   const isLogin = useSelector(state => state.auth.isLogin);
+  const user = auth.currentUser; // 현재 로그인한 사용자
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', params.postId],
@@ -84,7 +85,7 @@ const DetailPostPage = () => {
   return (
     <PostContainer>
       <ButtonWrapper>
-        {isLogin && (
+        {isLogin && user?.email === data?.userEmail && (
           <>
             <Button width="70" onClick={handleEdit}>
               Edit

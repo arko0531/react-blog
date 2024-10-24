@@ -3,12 +3,17 @@ import Input from '../ui/Input';
 import styled from 'styled-components';
 import Button from '../ui/Button';
 import { useSearchParams } from 'react-router-dom';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore'; // Firestore 함수 import
 import { db, auth } from '../../firebase';
 import { useMutation } from '@tanstack/react-query';
-
 import { useNavigate } from 'react-router-dom';
+import googleLogo from '../../assets/google-logo.png';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
@@ -69,6 +74,18 @@ const AuthForm = () => {
     navigate('/auth?mode=register');
   };
 
+  // 구글 회원가입
+  const handleGoogleLogin = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+
+      navigate('/');
+    } catch (error) {
+      alert('로그인 오류 : ' + error);
+    }
+  };
+
   return (
     <>
       <StyledAuthForm id="authForm" onSubmit={handleAuth}>
@@ -97,12 +114,14 @@ const AuthForm = () => {
         )}
         <ButtonWrapper>
           <Button type="submit">{isLogin === 'login' ? 'Login' : 'SignUp'}</Button>
+
           {isLogin === 'login' && (
             <Button type="button" onClick={handleRegister} $bgColor="white">
               register
             </Button>
           )}
         </ButtonWrapper>
+        <Image src={googleLogo} onClick={handleGoogleLogin} />
       </StyledAuthForm>
     </>
   );
@@ -126,4 +145,10 @@ const ButtonWrapper = styled.div`
   display: flex;
   margin-top: 40px;
   gap: 10px;
+`;
+
+const Image = styled.img`
+  margin-top: 40px;
+  cursor: pointer;
+  width: 45px;
 `;
