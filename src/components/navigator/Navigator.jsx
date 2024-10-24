@@ -10,7 +10,7 @@ const Navigator = () => {
   const navigate = useNavigate();
   const isLogin = useSelector(state => state.auth.isLogin);
 
-  const handleLoginout = async () => {
+  const handleLogout = async () => {
     try {
       await signOut(auth);
       navigate('/');
@@ -25,7 +25,7 @@ const Navigator = () => {
       {!isLogin ? (
         <NavText to="/auth?mode=login">Login</NavText>
       ) : (
-        <LogoutButton onClick={handleLoginout}>Logout</LogoutButton>
+        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       )}
     </Nav>
   );

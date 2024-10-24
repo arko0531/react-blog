@@ -1,21 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate, useParams } from 'react-router-dom';
 import { queryClient } from '../../util/http';
-import { doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, doc, setDoc, getDocs } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
-
+  const [postData, setPostData] = useState('');
+  const params = useParams();
   const navigator = useNavigate();
 
+  // 글 생성 / 수정
   const { mutate } = useMutation({
     mutationKey: ['formData'],
     mutationFn: async ({ title, content, postingDate, userEmail, postId, imageURL }) => {
@@ -31,8 +33,34 @@ const PostForm = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']);
       navigator('/');
+      if (params) {
+        redirect('./');
+      }
     },
   });
+
+  // 글 수정
+  // 일단 가져옴
+  const { data } = useQuery({
+    queryKey: ['post', params.postId],
+    queryFn: async () => {
+      const q = query(collection(db, 'posts'), where('postId', '==', params.postId));
+
+      const querySnapshot = await getDocs(q);
+      const posts = {};
+      querySnapshot.forEach(doc => {
+        posts[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      return posts[Object.keys(posts)[0]];
+    },
+    enabled: !!params.postId,
+  });
+
+  useEffect(() => {
+    if (data) {
+      setPostData(data);
+    }
+  }, [data]);
 
   const handleWritePost = async e => {
     e.preventDefault();
@@ -52,7 +80,7 @@ const PostForm = () => {
     const content = e.target.content.value;
     const postingDate = date;
     const userEmail = user.email;
-    const postId = uuidv4();
+    const postId = params.postId ? params.postId : uuidv4();
 
     mutate({ title, content, postingDate, userEmail, postId, imageURL });
 
@@ -86,9 +114,17 @@ const PostForm = () => {
   return (
     <Wrapper>
       <StyledPostForm onSubmit={handleWritePost}>
-        <PostTitle>새 게시글 작성</PostTitle>
+        <PostTitle>{postData ? '게시글 수정' : '새 게시글 작성'}</PostTitle>
 
-        <Input label="제목" type="text" id="title" width="100%" placeholder="제목을 입력해주세요." required />
+        <Input
+          label="제목"
+          type="text"
+          id="title"
+          width="100%"
+          defaultValue={postData?.title || ''}
+          placeholder="제목을 입력해주세요."
+          required
+        />
         <TextArea
           label="내용"
           type="text"
@@ -96,6 +132,7 @@ const PostForm = () => {
           width="100%"
           height="400px"
           placeholder="내용을 입력해주세요."
+          defaultValue={postData?.content || ''}
           required
         />
 
@@ -104,14 +141,13 @@ const PostForm = () => {
           type="file"
           id="image"
           width="40%"
-          placeholder="제목을 입력해주세요."
           accept="image/*"
           onChange={handleFileChange}
           required
         />
 
         <ButtonWrapper>
-          <Button type="submit">작성</Button>
+          <Button type="submit"> 작성</Button>
         </ButtonWrapper>
       </StyledPostForm>
     </Wrapper>
@@ -121,7 +157,7 @@ const PostForm = () => {
 export default PostForm;
 
 const Wrapper = styled.div`
-  width: 1200px;
+  width: 85%;
   margin: 60px auto;
   padding: 30px 80px;
   background-color: #f9f9f9;

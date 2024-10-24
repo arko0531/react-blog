@@ -54,6 +54,7 @@ const AuthForm = () => {
         return;
       } else if (password.length < 6 && passwordCheck.length < 6) {
         alert('비밀번호를 6자리 이상으로 설정해주세요.');
+        return;
       }
       try {
         await createUserWithEmailAndPassword(auth, email, password);
@@ -107,25 +108,7 @@ const AuthForm = () => {
   );
 };
 
-// mode로 바꿔야함
-
 export default AuthForm;
-
-// export async function action({ request }) {
-//   const data = await request.formData();
-
-//   const signUpData = {
-//     email: data.get('email'),
-//     password: data.get('passwordCheck'),
-//     name: data.get('name'),
-//   };
-
-//   // usersData(signUpData);
-
-//   return redirect('/');
-// }
-
-// 로그인 / 회원가입 조건부 렌더링
 
 const AuthTitle = styled.p`
   font-size: 30px;

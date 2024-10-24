@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '../../components/ui/Button';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { deleteObject, getStorage, ref } from 'firebase/storage';
+import Modal from '../../components/modal/Modal';
 
 const DetailPostPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const params = useParams();
   const isLogin = useSelector(state => state.auth.isLogin);
@@ -41,10 +45,6 @@ const DetailPostPage = () => {
     );
   }
 
-  if (!data) {
-    content = <p>현재 포스트가 없습니다.</p>;
-  }
-
   if (data) {
     content = (
       <>
@@ -59,14 +59,25 @@ const DetailPostPage = () => {
     );
   }
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   const handleEdit = () => {
     // 수정
     navigate(`/posts/${params.postId}/edit`);
   };
 
-  const handleDelete = () => {
-    // 삭제해야됨
-    navigate('/');
+  const handleDelete = async () => {
+    const postDocRef = doc(db, 'posts', data.id);
+    try {
+      await deleteDoc(postDocRef);
+      const imageRef = ref(getStorage(), data.imageURL);
+      await deleteObject(imageRef);
+
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
   };
 
   return (
@@ -74,12 +85,26 @@ const DetailPostPage = () => {
       <ButtonWrapper>
         {isLogin && (
           <>
-            <Button onClick={handleEdit}>Edit</Button>
-            <Button onClick={handleDelete}>Delete</Button>
+            <Button width="70" onClick={handleEdit}>
+              Edit
+            </Button>
+            <Button width="70" $bgColor="#f9f9f9" onClick={openModal}>
+              Delete
+            </Button>
           </>
         )}
       </ButtonWrapper>
       <Content>{content}</Content>
+      {isModalOpen && (
+        <Modal
+          message="정말 삭제하시겠습니까?"
+          onConfirm={() => {
+            handleDelete();
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      )}
     </PostContainer>
   );
 };
@@ -87,7 +112,7 @@ const DetailPostPage = () => {
 export default DetailPostPage;
 
 const PostContainer = styled.div`
-  width: 1200px;
+  width: 85%;
   margin: 60px auto;
   padding: 30px 50px;
   background-color: #f9f9f9;

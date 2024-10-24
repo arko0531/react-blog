@@ -2,7 +2,7 @@ import React from 'react';
 import PostCard from './card/PostCard';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 const PostList = () => {
@@ -31,10 +31,6 @@ const PostList = () => {
         <p> {error.message}</p>
       </>
     );
-  }
-
-  if (!data || Object.keys(data).length === 0) {
-    content = <p>현재 포스트가 없습니다.</p>;
   }
 
   if (data) {
