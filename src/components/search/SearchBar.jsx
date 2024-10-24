@@ -76,12 +76,12 @@ const SearchBar = () => {
 
   return (
     <Search>
-      <form onSubmit={handelSearchPost}>
+      <SearchForm onSubmit={handelSearchPost}>
         <SearchInput id="search" name="search" placeholder="검색어를 입력하세요..." />
         <Button type="submit" width="60">
           검색
         </Button>
-      </form>
+      </SearchForm>
 
       {content}
     </Search>
@@ -91,12 +91,14 @@ const SearchBar = () => {
 export default SearchBar;
 
 const Search = styled.div`
+  position: sticky;
+  top: 0px;
+  background-color: white;
   width: 100%;
-  height: 70px;
+  height: 120px;
   border-bottom: 1px solid gray;
   display: flex;
   justify-content: end;
-  align-items: center;
   padding-bottom: 40px;
   gap: 20px;
 `;
@@ -108,4 +110,10 @@ const SearchInput = styled.input`
   border-radius: 12px;
   margin-right: 10px;
   background-color: #4e7bd613;
+`;
+
+const SearchForm = styled.form`
+  display: flex;
+  flex-direction: row;
+  align-items: end;
 `;

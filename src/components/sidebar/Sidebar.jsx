@@ -45,11 +45,14 @@ const Main = styled.div`
 `;
 
 const Side = styled.div`
+  position: sticky;
+  top: 0px;
   display: flex;
   justify-content: center;
   align-items: start;
   padding-top: 100px;
   width: 400px;
+
   height: 100vh;
   background-color: #0554f2;
   box-shadow:
@@ -58,7 +61,7 @@ const Side = styled.div`
 `;
 
 const OutletStyled = styled.div`
-  padding: 50px;
+  padding: 0px 50px 50px 50px;
   display: flex;
   flex-direction: column;
   gap: 40px;
