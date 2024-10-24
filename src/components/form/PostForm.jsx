@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
+import { deleteObject, getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { redirect, useNavigate, useParams } from 'react-router-dom';
 import { queryClient } from '../../util/http';
@@ -16,11 +15,13 @@ const PostForm = () => {
   const [postData, setPostData] = useState('');
   const params = useParams();
   const navigator = useNavigate();
+  const inputEl = useRef(null);
+  const [fileName, setFileName] = useState('');
 
   // 글 생성 / 수정
   const { mutate } = useMutation({
     mutationKey: ['formData'],
-    mutationFn: async ({ title, content, postingDate, userEmail, postId, imageURL }) => {
+    mutationFn: async ({ title, content, postingDate, userEmail, postId, imageURL, imageName }) => {
       await setDoc(doc(db, 'posts', postId), {
         title,
         content,
@@ -28,6 +29,7 @@ const PostForm = () => {
         userEmail,
         postId,
         imageURL,
+        imageName,
       });
     },
     onSuccess: () => {
@@ -59,6 +61,7 @@ const PostForm = () => {
   useEffect(() => {
     if (data) {
       setPostData(data);
+      setFileName(data?.imageName || '');
     }
   }, [data]);
 
@@ -66,12 +69,25 @@ const PostForm = () => {
     e.preventDefault();
     const user = auth.currentUser;
 
-    // 파일
-    const storage = getStorage();
-    const fileRef = ref(storage, uuidv4());
-    await uploadString(fileRef, attachment, 'data_url');
+    if (!fileName) {
+      alert('사진을 추가해주세요.');
+      return;
+    }
 
-    const imageURL = await getDownloadURL(fileRef);
+    let imageURL;
+
+    // 파일
+    if (attachment) {
+      // 새로 작성 시 사진
+      const storage = getStorage();
+      const fileRef = ref(storage, uuidv4());
+      await uploadString(fileRef, attachment, 'data_url');
+      imageURL = await getDownloadURL(fileRef); // URL
+    } else {
+      imageURL = data?.imageURL; // 기존 사진 그대로 사용
+    }
+
+    const imageName = fileName; // 이름
 
     // 날짜
     const date = getPostingDate();
@@ -82,14 +98,20 @@ const PostForm = () => {
     const userEmail = user.email;
     const postId = params.postId ? params.postId : uuidv4();
 
-    mutate({ title, content, postingDate, userEmail, postId, imageURL });
+    mutate({ title, content, postingDate, userEmail, postId, imageURL, imageName });
 
     setAttachment('');
+    setFileName('');
   };
 
-  const handleFileChange = e => {
+  const handleFileInput = useCallback(e => {
     const files = e.target.files;
-    const theFile = files[0];
+    const theFile = files[0]; // file url
+
+    // file name
+    if (files && files[0]) {
+      setFileName(e.target.files[0].name);
+    }
 
     const reader = new FileReader();
 
@@ -99,7 +121,16 @@ const PostForm = () => {
     };
 
     reader.readAsDataURL(theFile);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (inputEl.current !== null) {
+      inputEl.current.addEventListener('input', handleFileInput);
+    }
+    return () => {
+      inputEl.current && inputEl.current.removeEventListener('input', handleFileInput);
+    };
+  }, [inputEl, handleFileInput]);
 
   const getPostingDate = () => {
     // 날짜 설정
@@ -139,7 +170,15 @@ const PostForm = () => {
           />
         </TextAreaWrapper>
 
-        <Input type="file" id="image" width="40%" accept="image/*" onChange={handleFileChange} required />
+        <FileContainer>
+          <label htmlFor="file">
+            <InputFile>
+              <AttachmentButton>🔗 FILE UPLOAD</AttachmentButton>
+              {fileName ? <AttachedFile className="file-name">{fileName}</AttachedFile> : ''}
+            </InputFile>
+          </label>
+          <NoneInput type="file" id="file" accept="image/*" ref={inputEl} />
+        </FileContainer>
 
         <ButtonWrapper>
           <Button type="submit"> 작성</Button>
@@ -197,4 +236,45 @@ const TextAreaWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
+`;
+
+// 파일 커스텀
+const FileContainer = styled.section`
+  display: flex;
+  flex-direction: column;
+  margin-top: 40px;
+  width: 400px;
+`;
+
+const InputFile = styled.div`
+  display: flex;
+  gap: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  width: 400px;
+`;
+
+const NoneInput = styled.input`
+  display: none;
+`;
+
+const AttachmentButton = styled.div`
+  width: fit-content;
+  padding: 16px;
+  background-color: #191b27;
+  border-radius: 12px;
+  color: white;
+  font-weight: bold;
+  width: 210px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+`;
+
+const AttachedFile = styled.p`
+  font-size: 16px;
+  font-weight: 500;
+  color: #999;
 `;
