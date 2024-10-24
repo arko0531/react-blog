@@ -49,6 +49,7 @@ const DetailPostPage = () => {
     content = (
       <>
         <h1>{data.title}</h1>
+        <PostingDate>작성자 : {data.userEmail}</PostingDate>
         <PostingDate>작성일 : {data.postingDate}</PostingDate>
         <div>
           <ImgBox src={data.imageURL} alt="post image" />
@@ -142,7 +143,7 @@ const Content = styled.div`
   h1 {
     font-size: 30px;
     font-weight: 500;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
   }
 `;
 

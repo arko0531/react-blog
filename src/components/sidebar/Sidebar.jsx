@@ -52,6 +52,9 @@ const Side = styled.div`
   width: 400px;
   height: 100vh;
   background-color: #0554f2;
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.19),
+    0 6px 10px rgba(0, 0, 0, 0.23);
 `;
 
 const OutletStyled = styled.div`
