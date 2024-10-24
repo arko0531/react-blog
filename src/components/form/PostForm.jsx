@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { redirect, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { queryClient } from '../../util/http';
 import { collection, query, where, doc, setDoc, getDocs } from 'firebase/firestore';
 import { db, auth } from '../../firebase';
@@ -14,7 +14,7 @@ const PostForm = () => {
   const [attachment, setAttachment] = useState();
   const [postData, setPostData] = useState('');
   const params = useParams();
-  const navigator = useNavigate();
+  const navigate = useNavigate();
   const inputEl = useRef(null);
   const [fileName, setFileName] = useState('');
 
@@ -34,9 +34,9 @@ const PostForm = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']);
-      navigator('/');
+      navigate('/');
       if (params) {
-        redirect('./');
+        navigate(`/posts/${params.postId}`);
       }
     },
   });

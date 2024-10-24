@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Button from '../ui/Button';
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { useDispatch } from 'react-redux';
+import { postsActions } from '../../store/reducers/posts';
 
 const SearchBar = () => {
   const [search, setSearch] = useState('');
+  const dispatch = useDispatch();
 
   // 검색 쿼리 실행
-  const { data, isLoading, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['posts', { search: search }],
     queryFn: async ({ queryKey }) => {
       const searchValue = queryKey[1].search;
@@ -27,7 +30,6 @@ const SearchBar = () => {
       });
       return posts;
     },
-    enabled: !!search,
   });
 
   const handelSearchPost = e => {
@@ -36,43 +38,23 @@ const SearchBar = () => {
 
     if (searchValue) {
       setSearch(searchValue);
+    } else {
+      dispatch(postsActions.handleSearchPostsResult(null));
+      dispatch(postsActions.hadleFoundSerchResult(true));
     }
   };
 
-  let content;
-
-  if (isLoading) {
-    content = <p>검색 중...</p>;
-  }
-
-  if (error) {
-    content = (
-      <>
-        <p>검색 오류 발생</p>
-        <p> {error.message}</p>
-      </>
-    );
-  }
-
-  if (data && Object.keys(data).length > 0) {
-    const posts = Object.values(data);
-
-    content = (
-      <>
-        <div>
-          <ul>
-            {posts.map(post => (
-              <li key={post.id}>{post.title}</li>
-            ))}
-          </ul>
-        </div>
-      </>
-    );
-  }
-
-  if (!data && !isLoading && search) {
-    content = <p>검색 결과가 없습니다.</p>;
-  }
+  useEffect(() => {
+    if (data) {
+      const posts = Object.values(data);
+      if (posts.length > 0) {
+        dispatch(postsActions.handleSearchPostsResult(posts));
+        dispatch(postsActions.hadleFoundSerchResult(true));
+      } else if (search) {
+        dispatch(postsActions.hadleFoundSerchResult(false));
+      }
+    }
+  }, [data, dispatch, search]);
 
   return (
     <Search>
@@ -82,8 +64,6 @@ const SearchBar = () => {
           검색
         </Button>
       </SearchForm>
-
-      {content}
     </Search>
   );
 };

@@ -4,10 +4,12 @@ import styled from 'styled-components';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { postsActions } from '../../store/reducers/posts';
 
 const Navigator = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isLogin = useSelector(state => state.auth.isLogin);
 
   const user = auth.currentUser;
@@ -21,6 +23,10 @@ const Navigator = () => {
     }
   };
 
+  const handleResetSearchResult = () => {
+    dispatch(postsActions.handleSearchPostsResult(null));
+  };
+
   return (
     <Nav>
       {user && <User>{user.email} 님</User>}
@@ -29,7 +35,9 @@ const Navigator = () => {
       ) : (
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       )}
-      <NavText to="/">Home</NavText>
+      <NavText to="/" onClick={handleResetSearchResult}>
+        Home
+      </NavText>
       {isLogin && <NavText to="/posts/new">New Post</NavText>}
     </Nav>
   );

@@ -4,8 +4,12 @@ import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase';
+import { useSelector } from 'react-redux';
 
 const PostList = () => {
+  const searchResult = useSelector(state => state.posts.searchResult);
+  const foundSearchResult = useSelector(state => state.posts.foundSearchResult);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
@@ -16,6 +20,7 @@ const PostList = () => {
       });
       return posts;
     },
+    enabled: searchResult === null || searchResult.length === 0,
   });
 
   let content;
@@ -45,9 +50,23 @@ const PostList = () => {
     );
   }
 
+  if (searchResult) {
+    content = (
+      <PostListWrapper>
+        {searchResult.map(post => (
+          <PostCard key={post.postId} post={post} />
+        ))}
+      </PostListWrapper>
+    );
+  }
+
+  if (!foundSearchResult) {
+    content = <p>검색 결과가 없습니다.</p>;
+  }
+
   return (
     <>
-      <Title>POST</Title>
+      <Title>POSTS</Title>
       {content}
     </>
   );

@@ -8,6 +8,7 @@ import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/fire
 import { auth, db } from '../../firebase';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
 import Modal from '../../components/modal/Modal';
+import { queryClient } from '../../util/http';
 
 const DetailPostPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,10 +72,12 @@ const DetailPostPage = () => {
 
   const handleDelete = async () => {
     const postDocRef = doc(db, 'posts', data.id);
+
     try {
       await deleteDoc(postDocRef);
       const imageRef = ref(getStorage(), data.imageURL);
       await deleteObject(imageRef);
+      queryClient.invalidateQueries(['posts']);
 
       navigate('/');
     } catch (error) {
