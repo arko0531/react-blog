@@ -15,9 +15,10 @@ const SideBar = () => {
     const isLogin = onAuthStateChanged(auth, user => {
       if (user) {
         dispatch(authActions.login());
-        //console.log(user);
+        localStorage.setItem('token', user.accessToken);
       } else {
         dispatch(authActions.logout());
+        localStorage.removeItem('token');
       }
     });
 

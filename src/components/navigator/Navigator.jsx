@@ -30,7 +30,7 @@ const Navigator = () => {
         <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
       )}
       <NavText to="/">Home</NavText>
-      <NavText to="/posts/new">New Post</NavText>
+      {isLogin && <NavText to="/posts/new">New Post</NavText>}
     </Nav>
   );
 };
