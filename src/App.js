@@ -1,5 +1,9 @@
 import './App.css';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  redirect,
+  RouterProvider
+} from 'react-router-dom';
 import Sidebar from './components/sidebar/Sidebar';
 import MainPostPage from './pages/main/Index';
 import DetailPostPage from './pages/post/DetailPostPage';
@@ -10,8 +14,6 @@ import { Provider } from 'react-redux';
 import store from './store';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './util/http';
-import { app } from './firebase';
-import { checkAuthLoader } from './util/http';
 
 function App() {
   const router = createBrowserRouter([
@@ -47,3 +49,13 @@ function App() {
 }
 
 export default App;
+
+const checkAuthLoader = () => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    return redirect('/auth?mode=login');
+  }
+
+  return null;
+};
