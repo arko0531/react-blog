@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = { searchResult: null, foundSearchResult: true };
+const initialState = { searchPosts: '', searchResult: null, foundSearchResult: true };
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -11,6 +11,9 @@ const postsSlice = createSlice({
     },
     handleFoundSearchResult(state, action) {
       state.foundSearchResult = action.payload;
+    },
+    handleSearchPosts(state, action) {
+      state.searchPosts = action.payload;
     },
   },
 });

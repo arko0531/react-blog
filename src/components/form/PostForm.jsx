@@ -36,7 +36,11 @@ const PostForm = () => {
       queryClient.invalidateQueries(['posts']);
       navigate('/');
       // if (params) {
+<<<<<<< Updated upstream
       //   navigate(`/posts/${params.postId}`); // 왜 생성하면 여기로 가지 -> 뮤테이션 성공 값이 들어옴 ->
+=======
+      //   navigate(`/posts/${params.postId}`);
+>>>>>>> Stashed changes
       // }
     },
   });
