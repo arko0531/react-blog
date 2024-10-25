@@ -17,6 +17,7 @@ import googleLogo from '../../assets/google-logo.png';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
+
   const isLogin = searchParams.get('mode');
 
   const navigate = useNavigate();
