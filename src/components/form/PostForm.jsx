@@ -3,11 +3,23 @@ import styled from 'styled-components';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadString
+} from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { queryClient } from '../../util/http';
-import { collection, query, where, doc, setDoc, getDocs } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  doc,
+  setDoc,
+  getDocs
+} from 'firebase/firestore';
 import { db, auth } from '../../firebase';
 
 const PostForm = () => {
@@ -21,7 +33,15 @@ const PostForm = () => {
   // 글 생성 / 수정
   const { mutate } = useMutation({
     mutationKey: ['formData'],
-    mutationFn: async ({ title, content, postingDate, userEmail, postId, imageURL, imageName }) => {
+    mutationFn: async ({
+      title,
+      content,
+      postingDate,
+      userEmail,
+      postId,
+      imageURL,
+      imageName
+    }) => {
       await setDoc(doc(db, 'posts', postId), {
         title,
         content,
@@ -29,20 +49,17 @@ const PostForm = () => {
         userEmail,
         postId,
         imageURL,
-        imageName,
+        imageName
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']);
       navigate('/');
       // if (params) {
-<<<<<<< Updated upstream
       //   navigate(`/posts/${params.postId}`); // 왜 생성하면 여기로 가지 -> 뮤테이션 성공 값이 들어옴 ->
-=======
       //   navigate(`/posts/${params.postId}`);
->>>>>>> Stashed changes
       // }
-    },
+    }
   });
 
   // 글 수정
@@ -50,16 +67,19 @@ const PostForm = () => {
   const { data } = useQuery({
     queryKey: ['post', params.postId],
     queryFn: async () => {
-      const q = query(collection(db, 'posts'), where('postId', '==', params.postId));
+      const q = query(
+        collection(db, 'posts'),
+        where('postId', '==', params.postId)
+      );
 
       const querySnapshot = await getDocs(q);
       const posts = {};
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
       return posts[Object.keys(posts)[0]];
     },
-    enabled: !!params.postId,
+    enabled: !!params.postId
   });
 
   useEffect(() => {
@@ -69,7 +89,7 @@ const PostForm = () => {
     }
   }, [data]);
 
-  const handleWritePost = async e => {
+  const handleWritePost = async (e) => {
     e.preventDefault();
     const user = auth.currentUser;
 
@@ -102,13 +122,21 @@ const PostForm = () => {
     const userEmail = user.email;
     const postId = params.postId ? params.postId : uuidv4();
 
-    mutate({ title, content, postingDate, userEmail, postId, imageURL, imageName });
+    mutate({
+      title,
+      content,
+      postingDate,
+      userEmail,
+      postId,
+      imageURL,
+      imageName
+    });
 
     setAttachment('');
     setFileName('');
   };
 
-  const handleFileInput = useCallback(e => {
+  const handleFileInput = useCallback((e) => {
     const files = e.target.files;
     const theFile = files[0]; // file url
 
@@ -119,7 +147,7 @@ const PostForm = () => {
 
     const reader = new FileReader();
 
-    reader.onloadend = finishedEvent => {
+    reader.onloadend = (finishedEvent) => {
       const result = finishedEvent.currentTarget.result;
       setAttachment(result);
     };
@@ -132,7 +160,8 @@ const PostForm = () => {
       inputEl.current.addEventListener('input', handleFileInput);
     }
     return () => {
-      inputEl.current && inputEl.current.removeEventListener('input', handleFileInput);
+      inputEl.current &&
+        inputEl.current.removeEventListener('input', handleFileInput);
     };
   }, [inputEl, handleFileInput]);
 
@@ -182,7 +211,11 @@ const PostForm = () => {
           <label htmlFor="file">
             <InputFile>
               <AttachmentButton>🔗 FILE UPLOAD</AttachmentButton>
-              {fileName ? <AttachedFile className="file-name">{fileName}</AttachedFile> : ''}
+              {fileName ? (
+                <AttachedFile className="file-name">{fileName}</AttachedFile>
+              ) : (
+                ''
+              )}
             </InputFile>
           </label>
           <NoneInput type="file" id="file" accept="image/*" ref={inputEl} />
