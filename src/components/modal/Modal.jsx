@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from 'components/ui/Button';
+import Button from '../ui/Button';
 
 const Modal = ({ message, onConfirm, onCancel }) => {
   return (

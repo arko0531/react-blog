@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
+import Input from '../ui/Input';
+import Button from '../ui/Button';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from 'util/http';
-import { v4 as uuidv4 } from 'uuid';
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadString
 } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
+import { useNavigate, useParams } from 'react-router-dom';
+import { queryClient } from '../../util/http';
 import {
   collection,
   query,
@@ -17,10 +20,7 @@ import {
   setDoc,
   getDocs
 } from 'firebase/firestore';
-import { db, auth } from 'firebase.js';
-import styled from 'styled-components';
-import Input from 'components/ui/Input';
-import Button from 'components/ui/Button';
+import { db, auth } from '../../firebase';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
