@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../../components/ui/Button';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
@@ -29,6 +29,18 @@ const DetailPostPage = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
       return posts[Object.keys(posts)[0]];
+    },
+  });
+
+  const { mutate } = useMutation({
+    mutationKey: ['deletePost'],
+    mutationFn: async ({ postDocRef, imageRef }) => {
+      await deleteDoc(postDocRef);
+      await deleteObject(imageRef);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['posts']); // 이거 지우면 오류 사라지는데 메인화면 새로고침 안됨
+      navigate('/');
     },
   });
 
@@ -72,16 +84,12 @@ const DetailPostPage = () => {
 
   const handleDelete = async () => {
     const postDocRef = doc(db, 'posts', data.id);
-
+    console.log(postDocRef);
     try {
-      await deleteDoc(postDocRef);
       const imageRef = ref(getStorage(), data.imageURL);
-      await deleteObject(imageRef);
-      queryClient.invalidateQueries(['posts']);
-
-      navigate('/');
+      mutate({ postDocRef, imageRef });
     } catch (error) {
-      console.error('Error deleting post:', error);
+      alert('삭제 오류 : ', error);
     }
   };
 

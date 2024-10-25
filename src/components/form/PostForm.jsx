@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Input from '../ui/Input';
 import Button from '../ui/Button';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { deleteObject, getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate, useParams } from 'react-router-dom';
 import { queryClient } from '../../util/http';
@@ -35,9 +35,13 @@ const PostForm = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']);
       navigate('/');
-      if (params) {
-        navigate(`/posts/${params.postId}`);
-      }
+      // if (params) {
+<<<<<<< Updated upstream
+      //   navigate(`/posts/${params.postId}`); // 왜 생성하면 여기로 가지 -> 뮤테이션 성공 값이 들어옴 ->
+=======
+      //   navigate(`/posts/${params.postId}`);
+>>>>>>> Stashed changes
+      // }
     },
   });
 
@@ -142,6 +146,10 @@ const PostForm = () => {
     return year + '년 ' + month + '월 ' + day + '일';
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   return (
     <Wrapper>
       <StyledPostForm onSubmit={handleWritePost}>
@@ -182,6 +190,9 @@ const PostForm = () => {
 
         <ButtonWrapper>
           <Button type="submit"> 작성</Button>
+          <Button type="button" $bgColor="white" onClick={handleCancel}>
+            취소
+          </Button>
         </ButtonWrapper>
       </StyledPostForm>
     </Wrapper>
@@ -216,6 +227,7 @@ const ButtonWrapper = styled.div`
   display: flex;
   margin-top: 40px;
   justify-content: flex-end;
+  gap: 20px;
 `;
 
 const TextArea = styled.textarea`

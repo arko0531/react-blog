@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Button from '../ui/Button';
 import { useQuery } from '@tanstack/react-query';
@@ -7,18 +7,28 @@ import { db } from '../../firebase';
 import { useDispatch } from 'react-redux';
 import { postsActions } from '../../store/reducers/posts';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const SearchBar = () => {
-  const [search, setSearch] = useState('');
+  // const [search, setSearch] = useState('');
+  const search = useSelector(state => state.posts.searchPosts);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const inputRef = useRef();
 
   // 검색 쿼리 실행
   const { data } = useQuery({
     queryKey: ['posts', { search: search }],
     queryFn: async ({ queryKey }) => {
+<<<<<<< Updated upstream
       const searchValue = queryKey[1].search;
+
+=======
       console.log(searchValue);
+      const searchValue = queryKey[1].search;
+      if (search.trim() === '') {
+      }
+>>>>>>> Stashed changes
       const q = query(
         collection(db, 'posts'),
         where('title', '>=', searchValue),
@@ -38,13 +48,17 @@ const SearchBar = () => {
     e.preventDefault();
     const searchValue = e.target.search.value.trim();
 
+    console.log(searchValue);
+
     if (searchValue) {
-      setSearch(searchValue);
+      dispatch(postsActions.handleSearchPosts(searchValue));
+      // setSearch(searchValue);
     } else {
       dispatch(postsActions.handleSearchPostsResult(null));
       dispatch(postsActions.handleFoundSearchResult(true));
     }
     navigate('/?mode=search');
+    inputRef.current.value = '';
   };
 
   useEffect(() => {
@@ -62,7 +76,7 @@ const SearchBar = () => {
   return (
     <Search>
       <SearchForm onSubmit={handelSearchPost}>
-        <SearchInput id="search" name="search" placeholder="검색어를 입력하세요..." />
+        <SearchInput id="search" name="search" placeholder="검색어를 입력하세요..." ref={inputRef} />
         <Button type="submit" width="60">
           검색
         </Button>

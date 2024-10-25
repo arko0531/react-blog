@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PostCard from './card/PostCard';
 import styled from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
@@ -7,6 +7,7 @@ import { db } from '../../firebase';
 import { useSelector } from 'react-redux';
 
 const PostList = () => {
+  const search = useSelector(state => state.posts.searchPosts);
   const searchResult = useSelector(state => state.posts.searchResult);
   const foundSearchResult = useSelector(state => state.posts.foundSearchResult);
 
