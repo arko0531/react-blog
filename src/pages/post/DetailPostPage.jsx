@@ -4,7 +4,14 @@ import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
-import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  where
+} from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
 import Modal from '../../components/modal/Modal';
@@ -15,21 +22,24 @@ const DetailPostPage = () => {
 
   const navigate = useNavigate();
   const params = useParams();
-  const isLogin = useSelector(state => state.auth.isLogin);
+  const isLogin = useSelector((state) => state.auth.isLogin);
   const user = auth.currentUser; // 현재 로그인한 사용자
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', params.postId],
     queryFn: async () => {
-      const q = query(collection(db, 'posts'), where('postId', '==', params.postId));
+      const q = query(
+        collection(db, 'posts'),
+        where('postId', '==', params.postId)
+      );
 
       const querySnapshot = await getDocs(q);
       const posts = {};
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
       return posts[Object.keys(posts)[0]];
-    },
+    }
   });
 
   const { mutate } = useMutation({
@@ -41,7 +51,7 @@ const DetailPostPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']); // 이거 지우면 오류 사라지는데 메인화면 새로고침 안됨
       navigate('/');
-    },
+    }
   });
 
   let content;

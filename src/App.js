@@ -21,16 +21,20 @@ function App() {
       children: [
         { index: true, element: <MainPostPage /> },
         { path: '/auth', element: <AuthenticationPage /> },
-        { path: '/posts/new', element: <WritePostPage />, loader: checkAuthLoader },
+        {
+          path: '/posts/new',
+          element: <WritePostPage />,
+          loader: checkAuthLoader
+        },
         {
           path: '/posts/:postId',
           children: [
             { index: true, element: <DetailPostPage /> },
-            { path: 'edit', element: <EditPostPage />, loader: checkAuthLoader },
-          ],
-        },
-      ],
-    },
+            { path: 'edit', element: <EditPostPage />, loader: checkAuthLoader }
+          ]
+        }
+      ]
+    }
   ]);
 
   return (
