@@ -9,7 +9,7 @@ const postsSlice = createSlice({
     handleSearchPostsResult(state, action) {
       state.searchResult = action.payload;
     },
-    hadleFoundSerchResult(state, action) {
+    handleFoundSearchResult(state, action) {
       state.foundSearchResult = action.payload;
     },
   },

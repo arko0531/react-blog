@@ -42,7 +42,7 @@ const SearchBar = () => {
       setSearch(searchValue);
     } else {
       dispatch(postsActions.handleSearchPostsResult(null));
-      dispatch(postsActions.hadleFoundSerchResult(true));
+      dispatch(postsActions.handleFoundSearchResult(true));
     }
     navigate('/?mode=search');
   };
@@ -52,9 +52,9 @@ const SearchBar = () => {
       const posts = Object.values(data);
       if (posts.length > 0) {
         dispatch(postsActions.handleSearchPostsResult(posts));
-        dispatch(postsActions.hadleFoundSerchResult(true));
+        dispatch(postsActions.handleFoundSearchResult(true));
       } else if (search) {
-        dispatch(postsActions.hadleFoundSerchResult(false));
+        dispatch(postsActions.handleFoundSearchResult(false));
       }
     }
   }, [data, dispatch, search]);
