@@ -1,9 +1,9 @@
 import React from 'react';
-import PostList from '../../components/post/PostList';
-import Button from '../../components/ui/Button';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import PostList from 'components/post/PostList';
+import Button from 'components/ui/Button';
 
 const MainPostPage = () => {
   const navigate = useNavigate();

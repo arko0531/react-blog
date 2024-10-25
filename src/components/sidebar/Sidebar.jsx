@@ -1,18 +1,18 @@
 import React, { useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
-import Navigator from '../navigator/Navigator';
-import SearchBar from '../search/SearchBar';
+import { Outlet } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
-import { authActions } from '../../store/reducers/auth';
-import { auth } from '../../firebase';
+import { authActions } from 'store/reducers/auth';
+import { auth } from 'firebase.js';
+import Navigator from 'components/navigator/Navigator';
+import SearchBar from 'components/search/SearchBar';
 
 const SideBar = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const isLogin = onAuthStateChanged(auth, user => {
+    const isLogin = onAuthStateChanged(auth, (user) => {
       if (user) {
         dispatch(authActions.login());
         localStorage.setItem('token', user.accessToken);
