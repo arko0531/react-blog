@@ -14,11 +14,9 @@ const SideBar = () => {
   useEffect(() => {
     const isLogin = onAuthStateChanged(auth, (user) => {
       if (user) {
-        dispatch(authActions.login());
-        localStorage.setItem('token', user.accessToken);
+        dispatch(authActions.login(user.accessToken));
       } else {
         dispatch(authActions.logout());
-        localStorage.removeItem('token');
       }
     });
 
