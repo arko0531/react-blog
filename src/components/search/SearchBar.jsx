@@ -18,7 +18,7 @@ const SearchBar = () => {
     queryKey: ['posts', { search: search }],
     queryFn: async ({ queryKey }) => {
       const searchValue = queryKey[1].search;
-      console.log(searchValue);
+
       const q = query(
         collection(db, 'posts'),
         where('title', '>=', searchValue),

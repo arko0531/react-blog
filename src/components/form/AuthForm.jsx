@@ -22,12 +22,13 @@ const AuthForm = () => {
   const navigate = useNavigate();
 
   const { mutate } = useMutation({
+    mutationKey: ['authData'],
     mutationFn: async ({ email, name, password }) => {
       await setDoc(doc(db, 'users', email), { email, name, password });
     },
     onSuccess: () => {
-      navigate('/auth?mode=login');
-      console.log('사용자 정보 저장 성공');
+      navigate('/');
+      // console.log('사용자 정보 저장 성공');
     },
     onError: error => {
       console.error(error);
