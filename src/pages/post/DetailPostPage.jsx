@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import Button from '../../components/ui/Button';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from 'util/http';
+import { useSelector } from 'react-redux';
 import {
   collection,
   deleteDoc,
@@ -12,10 +12,10 @@ import {
   query,
   where
 } from 'firebase/firestore';
+import { auth, db } from '../../firebase';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
-import { auth, db } from 'firebase.js';
-import Modal from 'components/modal/Modal';
-import Button from 'components/ui/Button';
+import Modal from '../../components/modal/Modal';
+import { queryClient } from '../../util/http';
 
 const DetailPostPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

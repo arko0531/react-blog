@@ -1,15 +1,16 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { postsActions } from 'store/reducers/posts';
 import { signOut } from 'firebase/auth';
-import { auth } from 'firebase.js';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../../firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { postsActions } from '../../store/reducers/posts';
 
 const Navigator = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isLogin = useSelector((state) => state.auth.isLogin);
+  const isLogin = useSelector(state => state.auth.isLogin);
 
   const user = auth.currentUser;
 
