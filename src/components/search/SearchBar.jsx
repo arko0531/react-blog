@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Button from '../ui/Button';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { useDispatch } from 'react-redux';
-import { postsActions } from '../../store/reducers/posts';
-import { useNavigate } from 'react-router-dom';
+import { db } from 'firebase.js';
+import Button from 'components/ui/Button';
 
 const SearchBar = () => {
   const [search, setSearch] = useState('');

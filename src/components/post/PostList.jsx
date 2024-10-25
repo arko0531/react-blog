@@ -1,27 +1,28 @@
-import React, { useEffect } from 'react';
-import PostCard from './card/PostCard';
+import React from 'react';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { useSelector } from 'react-redux';
+import { db } from 'firebase.js';
+import PostCard from 'components/post/card/PostCard';
 
 const PostList = () => {
-  const search = useSelector(state => state.posts.searchPosts);
-  const searchResult = useSelector(state => state.posts.searchResult);
-  const foundSearchResult = useSelector(state => state.posts.foundSearchResult);
+  const searchResult = useSelector((state) => state.posts.searchResult);
+  const foundSearchResult = useSelector(
+    (state) => state.posts.foundSearchResult
+  );
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
       const querySnapshot = await getDocs(collection(db, 'posts'));
       const posts = {};
-      querySnapshot.forEach(doc => {
+      querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
       return posts;
     },
-    enabled: searchResult === null || searchResult.length === 0,
+    enabled: searchResult === null || searchResult.length === 0
   });
 
   let content;
@@ -44,7 +45,7 @@ const PostList = () => {
 
     content = (
       <PostListWrapper>
-        {posts.map(post => (
+        {posts.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
@@ -54,7 +55,7 @@ const PostList = () => {
   if (searchResult) {
     content = (
       <PostListWrapper>
-        {searchResult.map(post => (
+        {searchResult.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
