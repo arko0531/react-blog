@@ -10,6 +10,7 @@ import Button from 'components/ui/Button';
 
 const SearchBar = () => {
   const [search, setSearch] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -31,33 +32,29 @@ const SearchBar = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
       return posts;
-    }
+    },
+    enabled: isSearching
   });
 
   const handelSearchPost = (e) => {
     e.preventDefault();
-    const searchValue = e.target.search.value.trim();
+    setIsSearching(true);
 
-    if (searchValue) {
-      setSearch(searchValue);
-    } else {
-      dispatch(postsActions.handleSearchPostsResult(null));
-      dispatch(postsActions.handleFoundSearchResult(true));
-    }
-    navigate('/?mode=search');
+    navigate(`/?mode=search&value=${search}`);
   };
 
   useEffect(() => {
-    if (data) {
+    if (isSearching && data) {
+      setIsSearching(false);
+      setSearch('');
       const posts = Object.values(data);
-      if (posts.length > 0) {
-        dispatch(postsActions.handleSearchPostsResult(posts));
-        dispatch(postsActions.handleFoundSearchResult(true));
-      } else if (search) {
-        dispatch(postsActions.handleFoundSearchResult(false));
-      }
+      dispatch(postsActions.handleSearchPostsResult(posts));
     }
-  }, [data, dispatch, search]);
+  }, [data, dispatch, isSearching]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
 
   return (
     <Search>
@@ -66,6 +63,8 @@ const SearchBar = () => {
           id="search"
           name="search"
           placeholder="검색어를 입력하세요..."
+          onChange={handleSearchChange}
+          value={search}
         />
         <Button type="submit" $width="60">
           검색

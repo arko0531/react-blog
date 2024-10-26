@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { postsActions } from 'store/reducers/posts';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { auth, db } from 'firebase.js';
 import { signOut } from 'firebase/auth';
@@ -11,7 +10,7 @@ import { queryClient } from 'util/http';
 
 const Navigator = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const location = useLocation();
   const isLogin = useSelector((state) => state.auth.isLogin);
 
   const user = auth.currentUser;
@@ -38,7 +37,6 @@ const Navigator = () => {
 
   if (data) {
     userName = data.name + '님';
-    console.log(userName);
   }
   if (user && user.displayName) {
     // 구글 로그인 시
@@ -56,22 +54,15 @@ const Navigator = () => {
     }
   };
 
-  const handleResetSearchResult = () => {
-    dispatch(postsActions.handleSearchPostsResult(null));
-    dispatch(postsActions.handleFoundSearchResult(true));
-  };
-
   return (
     <Nav>
       <User>{user && userName}</User>
       {!isLogin ? (
         <NavText to="/auth?mode=login">Login</NavText>
       ) : (
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+        <NavButton onClick={handleLogout}>Logout</NavButton>
       )}
-      <NavText to="/" onClick={handleResetSearchResult}>
-        Home
-      </NavText>
+      <NavText to="/">Home</NavText>
       {isLogin && <NavText to="/posts/new">New Post</NavText>}
     </Nav>
   );
@@ -108,7 +99,7 @@ const NavText = styled(NavLink)`
   }
 `;
 
-const LogoutButton = styled.button`
+const NavButton = styled.button`
   font-size: 20px;
   font-weight: 500;
   border: none;
