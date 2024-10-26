@@ -69,6 +69,11 @@ const AuthForm = () => {
         alert('비밀번호를 6자리 이상으로 설정해주세요.');
         return;
       }
+      if (!/^[ㄱ-ㅎ가-힣a-zA-Z]+$/.test(name)) {
+        alert('이름은 한글/영문만 입력할 수 있습니다.');
+        return;
+      }
+
       try {
         await createUserWithEmailAndPassword(auth, email, password);
         mutate({ email, name, password });
@@ -102,15 +107,16 @@ const AuthForm = () => {
           label="E-mail"
           type="email"
           id="email"
-          width="400px"
+          $width="400px"
           placeholder="이메일을 입력해주세요."
+          maxLength="320"
           required
         />
         <Input
           label="Password"
           id="password"
           type="password"
-          width="400px"
+          $width="400px"
           placeholder="비밀번호를 입력해 주세요."
           required
         />
@@ -120,7 +126,7 @@ const AuthForm = () => {
               label="Password 확인"
               id="passwordCheck"
               type="password"
-              width="400px"
+              $width="400px"
               placeholder="비밀번호를 다시 입력해 주세요."
               required
             />
@@ -128,7 +134,7 @@ const AuthForm = () => {
               label="Name"
               type="text"
               id="name"
-              width="400px"
+              $width="400px"
               placeholder="이름을 입력해 주세요."
               required
             />

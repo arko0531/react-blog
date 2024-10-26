@@ -3,8 +3,11 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from 'store/reducers/posts';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { auth } from 'firebase.js';
+import { useQuery } from '@tanstack/react-query';
+import { auth, db } from 'firebase.js';
 import { signOut } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { queryClient } from 'util/http';
 
 const Navigator = () => {
   const navigate = useNavigate();
@@ -13,9 +16,40 @@ const Navigator = () => {
 
   const user = auth.currentUser;
 
+  const { data } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const userQuery = query(
+        collection(db, 'users'),
+        where('email', '==', user.email)
+      );
+
+      const querySnapshot = await getDocs(userQuery);
+      const userData = {};
+      querySnapshot.forEach((doc) => {
+        userData[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      return userData[Object.keys(userData)[0]];
+    },
+    enabled: !!user
+  });
+
+  let userName;
+
+  if (data) {
+    userName = data.name + '님';
+    console.log(userName);
+  }
+  if (user && user.displayName) {
+    // 구글 로그인 시
+    userName = user.displayName + '님';
+  }
+
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      const signOutData = await signOut(auth);
+      userName = '';
+      queryClient.clear();
       navigate('/');
     } catch (error) {
       alert('로그아웃 실패');
@@ -29,7 +63,7 @@ const Navigator = () => {
 
   return (
     <Nav>
-      {user && <User>{user.email} 님</User>}
+      <User>{user && userName}</User>
       {!isLogin ? (
         <NavText to="/auth?mode=login">Login</NavText>
       ) : (

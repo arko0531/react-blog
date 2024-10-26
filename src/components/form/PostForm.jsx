@@ -191,7 +191,7 @@ const PostForm = () => {
           label="제목"
           type="text"
           id="title"
-          width="100%"
+          $width="100%"
           defaultValue={postData?.title || ''}
           placeholder="제목을 입력해주세요."
           required
@@ -202,8 +202,8 @@ const PostForm = () => {
             label="내용"
             type="text"
             id="content"
-            width="100%"
-            height="400px"
+            $width="100%"
+            $height="400px"
             placeholder="내용을 입력해주세요."
             defaultValue={postData?.content || ''}
             required
@@ -271,8 +271,8 @@ const TextArea = styled.textarea`
   border: none;
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
 
-  width: ${({ width }) => (width ? `${width}` : '400px')};
-  height: ${({ height }) => (height ? `${height}` : '40px')};
+  width: ${({ $width }) => ($width ? `${$width}` : '400px')};
+  height: ${({ $height }) => ($height ? `${$height}` : '40px')};
 `;
 
 const TextLabel = styled.label`

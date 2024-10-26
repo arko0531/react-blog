@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const Input = ({ formMargin, label, id, ...props }) => {
   return (
-    <FormInputWrapper formMargin={formMargin}>
+    <FormInputWrapper $formMargin={formMargin}>
       <FormLabel htmlFor={id}>{label}</FormLabel>
       <FormInput id={id} name={id} {...props} />
     </FormInputWrapper>
@@ -21,8 +21,8 @@ const FormInput = styled.input`
   border: none;
   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
 
-  width: ${({ width }) => (width ? `${width}` : '400px')};
-  height: ${({ height }) => (height ? `${height}` : '40px')};
+  width: ${({ $width }) => ($width ? `${$width}` : '400px')};
+  height: ${({ $height }) => ($height ? `${$height}` : '40px')};
 `;
 
 const FormInputWrapper = styled.div`

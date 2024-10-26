@@ -67,7 +67,7 @@ const SearchBar = () => {
           name="search"
           placeholder="검색어를 입력하세요..."
         />
-        <Button type="submit" width="60">
+        <Button type="submit" $width="60">
           검색
         </Button>
       </SearchForm>
