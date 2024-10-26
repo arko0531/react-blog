@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
+import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 
 const PostList = () => {
-  const searchResult = useSelector((state) => state.posts.searchResult);
-  const foundSearchResult = useSelector(
-    (state) => state.posts.foundSearchResult
-  );
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const search = searchParams.get('mode');
+  const posts = useSelector((state) => state.posts.posts);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
@@ -21,9 +23,17 @@ const PostList = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
       return posts;
-    },
-    enabled: searchResult === null || searchResult.length === 0
+    }
   });
+
+  useEffect(() => {}, []);
+
+  useEffect(() => {
+    if (data) {
+      const posts = Object.values(data);
+      dispatch(postsActions.handleSearchPostsResult(posts));
+    }
+  }, [data]);
 
   let content;
 
@@ -40,9 +50,7 @@ const PostList = () => {
     );
   }
 
-  if (data) {
-    const posts = Object.values(data);
-
+  if (posts.length > 0) {
     content = (
       <PostListWrapper>
         {posts.map((post) => (
@@ -50,20 +58,13 @@ const PostList = () => {
         ))}
       </PostListWrapper>
     );
-  }
-
-  if (searchResult) {
-    content = (
-      <PostListWrapper>
-        {searchResult.map((post) => (
-          <PostCard key={post.postId} post={post} />
-        ))}
-      </PostListWrapper>
-    );
-  }
-
-  if (!foundSearchResult) {
-    content = <p>검색 결과가 없습니다.</p>;
+  } else if (posts.length === 0 && !isLoading) {
+    content =
+      search === 'search' ? (
+        <p>검색 결과가 없습니다.</p>
+      ) : (
+        <p>현재 게시글이 없습니다.</p>
+      );
   }
 
   return (
