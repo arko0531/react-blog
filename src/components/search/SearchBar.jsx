@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import Button from '../ui/Button';
-import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase';
 import { useDispatch } from 'react-redux';
-import { postsActions } from '../../store/reducers/posts';
+import { postsActions } from 'store/reducers/posts';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from 'firebase.js';
+import Button from 'components/ui/Button';
 
 const SearchBar = () => {
   const [search, setSearch] = useState('');
@@ -19,13 +19,13 @@ const SearchBar = () => {
     queryFn: async ({ queryKey }) => {
       const searchValue = queryKey[1].search;
 
-      const q = query(
+      const searchQuery = query(
         collection(db, 'posts'),
         where('title', '>=', searchValue),
         where('title', '<=', searchValue + '\uf8ff')
       );
 
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(searchQuery);
       const posts = {};
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
