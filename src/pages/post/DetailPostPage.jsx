@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Button from '../../components/ui/Button';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
+import { queryClient } from 'util/http';
 import {
   collection,
   deleteDoc,
@@ -12,10 +12,10 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { auth, db } from '../../firebase';
+import { auth, db } from 'firebase.js';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
-import Modal from '../../components/modal/Modal';
-import { queryClient } from '../../util/http';
+import Button from 'components/ui/Button';
+import Modal from 'components/modal/Modal';
 
 const DetailPostPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,12 +28,12 @@ const DetailPostPage = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', params.postId],
     queryFn: async () => {
-      const q = query(
+      const paramsQuery = query(
         collection(db, 'posts'),
         where('postId', '==', params.postId)
       );
 
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(paramsQuery);
       const posts = {};
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
@@ -45,12 +45,15 @@ const DetailPostPage = () => {
   const { mutate } = useMutation({
     mutationKey: ['deletePost'],
     mutationFn: async ({ postDocRef, imageRef }) => {
-      await deleteDoc(postDocRef);
-      await deleteObject(imageRef);
+      const deletePost = await deleteDoc(postDocRef);
+      const deleteImage = await deleteObject(imageRef);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']); // 이거 지우면 오류 사라지는데 메인화면 새로고침 안됨
       navigate('/');
+    },
+    onError: (error) => {
+      alert('에러 발생 : ' + error);
     }
   });
 

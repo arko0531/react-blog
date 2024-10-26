@@ -1,17 +1,15 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import styled from 'styled-components';
-import Input from '../ui/Input';
-import Button from '../ui/Button';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { queryClient } from 'util/http';
+import { v4 as uuidv4 } from 'uuid';
 import {
   getDownloadURL,
   getStorage,
   ref,
   uploadString
 } from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid';
-import { useNavigate, useParams } from 'react-router-dom';
-import { queryClient } from '../../util/http';
 import {
   collection,
   query,
@@ -20,7 +18,9 @@ import {
   setDoc,
   getDocs
 } from 'firebase/firestore';
-import { db, auth } from '../../firebase';
+import { db, auth } from 'firebase.js';
+import Input from 'components/ui/Input';
+import Button from 'components/ui/Button';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
@@ -42,7 +42,7 @@ const PostForm = () => {
       imageURL,
       imageName
     }) => {
-      await setDoc(doc(db, 'posts', postId), {
+      const postingData = await setDoc(doc(db, 'posts', postId), {
         title,
         content,
         postingDate,
@@ -59,6 +59,9 @@ const PostForm = () => {
       //   navigate(`/posts/${params.postId}`); // 왜 생성하면 여기로 가지 -> 뮤테이션 성공 값이 들어옴 ->
       //   navigate(`/posts/${params.postId}`);
       // }
+    },
+    onError: (error) => {
+      alert('에러 발생 : ' + error);
     }
   });
 
@@ -67,12 +70,12 @@ const PostForm = () => {
   const { data } = useQuery({
     queryKey: ['post', params.postId],
     queryFn: async () => {
-      const q = query(
+      const editPostQuery = query(
         collection(db, 'posts'),
         where('postId', '==', params.postId)
       );
 
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(editPostQuery);
       const posts = {};
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };

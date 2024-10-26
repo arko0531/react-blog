@@ -1,19 +1,18 @@
-import React from 'react';
-import Input from '../ui/Input';
+import Input from 'components/ui/Input';
 import styled from 'styled-components';
-import Button from '../ui/Button';
+import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithPopup
 } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore'; // Firestore 함수 import
-import { db, auth } from '../../firebase';
-import { useMutation } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import googleLogo from '../../assets/google-logo.png';
+import { doc, setDoc } from 'firebase/firestore';
+import { db, auth } from 'firebase.js';
+import Button from 'components/ui/Button';
+import googleLogo from 'assets/google-logo.png';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
@@ -25,18 +24,21 @@ const AuthForm = () => {
   const { mutate } = useMutation({
     mutationKey: ['authData'],
     mutationFn: async ({ email, name, password }) => {
-      await setDoc(doc(db, 'users', email), { email, name, password });
+      const userData = await setDoc(doc(db, 'users', email), {
+        email,
+        name,
+        password
+      });
     },
     onSuccess: () => {
       navigate('/');
-      // console.log('사용자 정보 저장 성공');
     },
-    onError: error => {
-      console.error(error);
-    },
+    onError: (error) => {
+      alert('에러 발생 : ' + error);
+    }
   });
 
-  const handleAuth = async e => {
+  const handleAuth = async (e) => {
     e.preventDefault();
 
     const email = e.target.email.value;
@@ -45,7 +47,11 @@ const AuthForm = () => {
     // 로그인
     if (isLogin === 'login') {
       try {
-        await signInWithEmailAndPassword(auth, email, password);
+        const authData = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
         navigate('/');
       } catch (error) {
         alert('로그인 오류 : ' + error);
@@ -80,7 +86,7 @@ const AuthForm = () => {
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
+      const googleLoginData = await signInWithPopup(auth, provider);
 
       navigate('/');
     } catch (error) {
@@ -92,7 +98,14 @@ const AuthForm = () => {
     <>
       <StyledAuthForm id="authForm" onSubmit={handleAuth}>
         <AuthTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</AuthTitle>
-        <Input label="E-mail" type="email" id="email" width="400px" placeholder="이메일을 입력해주세요." required />
+        <Input
+          label="E-mail"
+          type="email"
+          id="email"
+          width="400px"
+          placeholder="이메일을 입력해주세요."
+          required
+        />
         <Input
           label="Password"
           id="password"
@@ -111,11 +124,20 @@ const AuthForm = () => {
               placeholder="비밀번호를 다시 입력해 주세요."
               required
             />
-            <Input label="Name" type="text" id="name" width="400px" placeholder="이름을 입력해 주세요." required />
+            <Input
+              label="Name"
+              type="text"
+              id="name"
+              width="400px"
+              placeholder="이름을 입력해 주세요."
+              required
+            />
           </>
         )}
         <ButtonWrapper>
-          <Button type="submit">{isLogin === 'login' ? 'Login' : 'SignUp'}</Button>
+          <Button type="submit">
+            {isLogin === 'login' ? 'Login' : 'SignUp'}
+          </Button>
 
           {isLogin === 'login' && (
             <Button type="button" onClick={handleRegister} $bgColor="white">
