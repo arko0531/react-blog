@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
-const Error = ({ title, message }) => {
+const Error = ({ title, message, error }) => {
   return (
     <ErrorWrapper>
       <Title>{title}</Title>
 
       <Message>{message}</Message>
+      <p>{error}</p>
       <HomeLink to="/">메인으로 돌아가기</HomeLink>
     </ErrorWrapper>
   );

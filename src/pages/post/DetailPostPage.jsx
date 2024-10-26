@@ -111,10 +111,10 @@ const DetailPostPage = () => {
       <ButtonWrapper>
         {isLogin && user?.email === data?.userEmail && (
           <>
-            <Button width="70" onClick={handleEdit}>
+            <Button $width="70" onClick={handleEdit}>
               Edit
             </Button>
-            <Button width="70" $bgColor="white" onClick={openModal}>
+            <Button $width="70" $bgColor="white" onClick={openModal}>
               Delete
             </Button>
           </>
