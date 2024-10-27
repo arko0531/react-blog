@@ -40,7 +40,7 @@ const PostList = () => {
   // 페이지네이션
   const lastPage = currentPage * postsPerPage;
   const firstPage = lastPage - postsPerPage;
-  const offset = posts?.slice(firstPage, lastPage); // 전체 게시물 중에서 현재 페이지 게시물들만 슬라이스
+  const currentPosts = posts?.slice(firstPage, lastPage); // 전체 게시물 중에서 현재 페이지 게시물들만 슬라이스
 
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(posts.length / postsPerPage); i++) {
@@ -62,15 +62,15 @@ const PostList = () => {
     );
   }
 
-  if (offset.length > 0) {
+  if (currentPosts.length > 0) {
     content = (
       <PostListWrapper>
-        {offset.map((post) => (
+        {currentPosts.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
     );
-  } else if (offset.length === 0 && !isLoading) {
+  } else if (currentPosts.length === 0 && !isLoading) {
     content =
       search === 'search' ? (
         <p>검색 결과가 없습니다.</p>
