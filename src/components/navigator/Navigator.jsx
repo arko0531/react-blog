@@ -10,7 +10,6 @@ import { queryClient } from 'util/http';
 
 const Navigator = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const isLogin = useSelector((state) => state.auth.isLogin);
 
   const user = auth.currentUser;

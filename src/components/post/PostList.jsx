@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
+import Pagination from 'react-js-pagination';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 
 const PostList = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
+
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('mode');
@@ -26,14 +30,21 @@ const PostList = () => {
     }
   });
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
       dispatch(postsActions.handleSearchPostsResult(posts));
     }
   }, [data]);
+
+  // 페이지네이션
+  const lastPage = currentPage * postsPerPage;
+  const firstPage = lastPage - postsPerPage;
+  const currentPosts = posts?.slice(firstPage, lastPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   let content;
 
@@ -50,15 +61,15 @@ const PostList = () => {
     );
   }
 
-  if (posts.length > 0) {
+  if (currentPosts.length > 0) {
     content = (
       <PostListWrapper>
-        {posts.map((post) => (
+        {currentPosts.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
     );
-  } else if (posts.length === 0 && !isLoading) {
+  } else if (currentPosts.length === 0 && !isLoading) {
     content =
       search === 'search' ? (
         <p>검색 결과가 없습니다.</p>
@@ -71,6 +82,22 @@ const PostList = () => {
     <>
       <Title>POSTS</Title>
       {content}
+      {posts && (
+        <PaginationWrapper>
+          <Pagination
+            activePage={currentPage}
+            itemsCountPerPage={postsPerPage}
+            totalItemsCount={posts.length}
+            pageRangeDisplayed={5}
+            prevPageText={'<'}
+            nextPageText={'>'}
+            onChange={handlePageChange}
+            itemClass="pagination-item"
+            linkClass="pagination-link"
+            activeClass="active"
+          />
+        </PaginationWrapper>
+      )}
     </>
   );
 };
@@ -89,4 +116,40 @@ const PostListWrapper = styled.div`
 const Title = styled.h1`
   font-size: 30px;
   font-weight: 500;
+`;
+
+const PaginationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  font-size: 22px;
+
+  .pagination-item {
+    display: inline-block;
+    margin: 0px 10px;
+
+    background-color: #ffdd1ef9;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 10px;
+    line-height: 40px;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f9bb03;
+    }
+  }
+
+  .pagination-link {
+    display: inline-block;
+  }
+
+  .active {
+    background-color: #f9bb03;
+  }
 `;
