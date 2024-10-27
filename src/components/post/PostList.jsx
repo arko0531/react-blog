@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -7,8 +7,12 @@ import { useQuery } from '@tanstack/react-query';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
+import Button from 'components/ui/Button';
 
 const PostList = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
+
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('mode');
@@ -26,14 +30,22 @@ const PostList = () => {
     }
   });
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
       dispatch(postsActions.handleSearchPostsResult(posts));
     }
   }, [data]);
+
+  // 페이지네이션
+  const lastPage = currentPage * postsPerPage;
+  const firstPage = lastPage - postsPerPage;
+  const offset = posts?.slice(firstPage, lastPage); // 전체 게시물 중에서 현재 페이지 게시물들만 슬라이스
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(posts.length / postsPerPage); i++) {
+    pageNumbers.push(i);
+  }
 
   let content;
 
@@ -50,15 +62,15 @@ const PostList = () => {
     );
   }
 
-  if (posts.length > 0) {
+  if (offset.length > 0) {
     content = (
       <PostListWrapper>
-        {posts.map((post) => (
+        {offset.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
     );
-  } else if (posts.length === 0 && !isLoading) {
+  } else if (offset.length === 0 && !isLoading) {
     content =
       search === 'search' ? (
         <p>검색 결과가 없습니다.</p>
@@ -71,6 +83,17 @@ const PostList = () => {
     <>
       <Title>POSTS</Title>
       {content}
+      <Pagination>
+        {pageNumbers.map((number) => (
+          <Button
+            key={number}
+            $width="40"
+            onClick={() => setCurrentPage(number)}
+          >
+            {number}
+          </Button>
+        ))}
+      </Pagination>
     </>
   );
 };
@@ -89,4 +112,11 @@ const PostListWrapper = styled.div`
 const Title = styled.h1`
   font-size: 30px;
   font-weight: 500;
+`;
+
+const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
 `;
