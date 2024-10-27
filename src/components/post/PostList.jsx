@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
@@ -16,7 +16,7 @@ import PostCard from 'components/post/card/PostCard';
 
 const PostList = () => {
   const [key, setKey] = useState(null); // 마지막으로 불러온 스냅샷의 개수
-  const throttle = useRef(null); // 쓰로틀링 처리
+  const postsCount = 6;
 
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -26,7 +26,7 @@ const PostList = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const postsQuery = query(collection(db, 'posts'), limit(6));
+      const postsQuery = query(collection(db, 'posts'), limit(postsCount));
 
       const querySnapshot = await getDocs(postsQuery);
       const posts = {};
@@ -46,7 +46,7 @@ const PostList = () => {
     const postsQuery = query(
       collection(db, 'posts'),
       startAfter(key),
-      limit(6)
+      limit(postsCount)
     );
 
     const querySnapshot = await getDocs(postsQuery);
@@ -63,25 +63,24 @@ const PostList = () => {
     return posts;
   };
 
-  const handleScroll = () => {
-    if (!throttle.current) {
-      throttle.current = setTimeout(async () => {
-        const scrollHeight = document.documentElement.scrollHeight;
-        const scrollTop = document.documentElement.scrollTop;
-        const clientHeight = document.documentElement.clientHeight;
+  const handleScroll = async () => {
+    const scrollHeight = document.documentElement.scrollHeight;
+    const scrollTop = document.documentElement.scrollTop;
+    const clientHeight = document.documentElement.clientHeight;
 
-        if (scrollTop + clientHeight >= scrollHeight) {
-          const morePost = await loadMore();
-          if (morePost) {
-            const newPosts = Object.values(morePost);
-            dispatch(postsActions.handleSearchPostsResult(newPosts));
-          }
-          throttle.current = null;
-        }
-      }, 500); // 0.5초
-
-      // console.log('도달');
+    if (scrollTop + clientHeight >= scrollHeight) {
+      const morePost = await loadMore();
+      if (morePost) {
+        const newPosts = Object.values(morePost);
+        dispatch(
+          postsActions.handleSearchPostsResult({
+            posts: newPosts,
+            reset: false
+          })
+        );
+      }
     }
+    // console.log('도달');
   };
 
   useEffect(() => {
@@ -94,7 +93,9 @@ const PostList = () => {
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(
+        postsActions.handleSearchPostsResult({ posts: posts, reset: true })
+      );
     }
   }, [data]);
 
