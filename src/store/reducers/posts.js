@@ -7,7 +7,7 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     handleSearchPostsResult(state, action) {
-      state.posts = action.payload;
+      state.posts = [...state.posts, ...action.payload];
     }
   }
 });
