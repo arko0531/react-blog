@@ -48,7 +48,9 @@ const SearchBar = () => {
       setIsSearching(false);
       setSearch('');
       const posts = Object.values(data);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(
+        postsActions.handleSearchPostsResult({ posts: posts, reset: true })
+      );
     }
   }, [data, dispatch, isSearching]);
 

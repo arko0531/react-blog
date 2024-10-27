@@ -7,7 +7,11 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     handleSearchPostsResult(state, action) {
-      state.posts = action.payload;
+      if (action.payload.reset) {
+        state.posts = action.payload.posts;
+      } else {
+        state.posts = [...state.posts, ...action.payload.posts];
+      }
     }
   }
 });
