@@ -40,7 +40,8 @@ const PostForm = () => {
       userEmail,
       postId,
       imageURL,
-      imageName
+      imageName,
+      timeStamp
     }) => {
       const postingData = await setDoc(doc(db, 'posts', postId), {
         title,
@@ -49,7 +50,8 @@ const PostForm = () => {
         userEmail,
         postId,
         imageURL,
-        imageName
+        imageName,
+        timeStamp
       });
     },
     onSuccess: () => {
@@ -124,6 +126,7 @@ const PostForm = () => {
     const postingDate = date;
     const userEmail = user.email;
     const postId = params.postId ? params.postId : uuidv4();
+    const timeStamp = Number(new Date());
 
     mutate({
       title,
@@ -132,7 +135,8 @@ const PostForm = () => {
       userEmail,
       postId,
       imageURL,
-      imageName
+      imageName,
+      timeStamp
     });
 
     setAttachment('');

@@ -1,32 +1,40 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import {
   collection,
   getDocs,
   limit,
+  orderBy,
   query,
-  startAfter
+  startAfter,
+  where
 } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 
 const PostList = () => {
-  const [key, setKey] = useState(null); // 마지막으로 불러온 스냅샷의 개수
+  // const [key, setKey] = useState(null); // 마지막으로 불러온 스냅샷의 개수
+  const { postKey, setPostKey } = useOutletContext();
   const postsCount = 6;
 
-  const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('mode');
   const posts = useSelector((state) => state.posts.posts);
+  const searchValue = useSelector((state) => state.posts.searchValue);
+  const dispatch = useDispatch();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const postsQuery = query(collection(db, 'posts'), limit(postsCount));
+      const postsQuery = query(
+        collection(db, 'posts'),
+        orderBy('timeStamp', 'desc'),
+        limit(postsCount)
+      );
 
       const querySnapshot = await getDocs(postsQuery);
       const posts = {};
@@ -34,7 +42,7 @@ const PostList = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
 
-      setKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
       return posts;
     }
@@ -43,12 +51,15 @@ const PostList = () => {
   // 인피니티 스크롤
 
   const loadMore = async () => {
-    if (!key) {
+    if (!postKey) {
       return;
     }
     const postsQuery = query(
       collection(db, 'posts'),
-      startAfter(key),
+      where('title', '>=', searchValue || ''),
+      where('title', '<=', searchValue || '' + '\uf8ff'),
+      orderBy('timeStamp', 'desc'),
+      startAfter(postKey),
       limit(postsCount)
     );
 
@@ -61,7 +72,7 @@ const PostList = () => {
     if (querySnapshot.empty === 0) {
       return;
     }
-    setKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
     return posts;
   };
@@ -75,12 +86,7 @@ const PostList = () => {
       const morePost = await loadMore();
       if (morePost) {
         const newPosts = Object.values(morePost);
-        dispatch(
-          postsActions.handleSearchPostsResult({
-            posts: newPosts,
-            reset: false
-          })
-        );
+        dispatch(postsActions.handlePostsList(newPosts));
       }
     }
     // console.log('도달');
@@ -96,11 +102,9 @@ const PostList = () => {
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
-      dispatch(
-        postsActions.handleSearchPostsResult({ posts: posts, reset: true })
-      );
+      dispatch(postsActions.handleSearchPostsResult(posts));
     }
-  }, [data]);
+  }, [data, dispatch]);
 
   let content;
 
