@@ -41,8 +41,11 @@ const PostList = () => {
   });
 
   // 인피니티 스크롤
-
   const loadMore = async () => {
+    if (!key) {
+      return;
+    }
+
     const postsQuery = query(
       collection(db, 'posts'),
       startAfter(key),
