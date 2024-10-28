@@ -43,6 +43,9 @@ const PostList = () => {
   // 인피니티 스크롤
 
   const loadMore = async () => {
+    if (!key) {
+      return;
+    }
     const postsQuery = query(
       collection(db, 'posts'),
       startAfter(key),
@@ -116,11 +119,11 @@ const PostList = () => {
 
   if (posts.length > 0) {
     content = (
-      <PostListWrapper>
+      <>
         {posts.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
-      </PostListWrapper>
+      </>
     );
   } else if (posts.length === 0 && !isLoading) {
     content =
@@ -134,7 +137,7 @@ const PostList = () => {
   return (
     <>
       <Title>POSTS</Title>
-      {content}
+      <PostListWrapper>{content}</PostListWrapper>
     </>
   );
 };
