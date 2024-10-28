@@ -1,36 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where
+} from 'firebase/firestore';
 import { db } from 'firebase.js';
 import Button from 'components/ui/Button';
 
-const SearchBar = () => {
+const SearchBar = ({ setPostKey }) => {
   const [search, setSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const searchValue = useSelector((state) => state.posts.searchValue);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 검색 쿼리 실행
   const { data } = useQuery({
-    queryKey: ['posts', { search: search }],
+    queryKey: ['posts', { search: searchValue }],
     queryFn: async ({ queryKey }) => {
-      const searchValue = queryKey[1].search;
+      const search = queryKey[1].search;
 
       const searchQuery = query(
         collection(db, 'posts'),
-        where('title', '>=', searchValue),
-        where('title', '<=', searchValue + '\uf8ff')
+        where('title', '>=', search),
+        where('title', '<=', search + '\uf8ff'), // 검색이 문젠가
+        orderBy('timeStamp', 'desc'),
+        limit(6)
       );
+
+      console.log('click');
 
       const querySnapshot = await getDocs(searchQuery);
       const posts = {};
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
+
+      setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]); // 이거 추가하면 검색창 작동 안함 (이거 넣으면 클릭도 늦게됨)
+
       return posts;
     },
     enabled: isSearching
@@ -38,6 +53,7 @@ const SearchBar = () => {
 
   const handelSearchPost = (e) => {
     e.preventDefault();
+    dispatch(postsActions.setSearchValue(search));
     setIsSearching(true);
 
     navigate(`/?mode=search&value=${search}`);
@@ -48,9 +64,7 @@ const SearchBar = () => {
       setIsSearching(false);
       setSearch('');
       const posts = Object.values(data);
-      dispatch(
-        postsActions.handleSearchPostsResult({ posts: posts, reset: true })
-      );
+      dispatch(postsActions.handleSearchPostsResult(posts));
     }
   }, [data, dispatch, isSearching]);
 
