@@ -54,23 +54,15 @@ const PostList = () => {
     if (!postKey) {
       return;
     }
-    // console.log(postKey);
 
-    const postsQuery = searchValue
-      ? query(
-          collection(db, 'posts'),
-          where('title', '>=', searchValue || ''),
-          where('title', '<=', searchValue + '\uf8ff'),
-          orderBy('timeStamp', 'desc'),
-          startAfter(postKey),
-          limit(postsCount)
-        )
-      : query(
-          collection(db, 'posts'),
-          orderBy('timeStamp', 'desc'),
-          startAfter(postKey),
-          limit(postsCount)
-        );
+    const postsQuery = query(
+      collection(db, 'posts'),
+      where('title', '>=', searchValue),
+      where('title', '<=', searchValue + '\uf8ff'),
+      orderBy('timeStamp', 'desc'),
+      startAfter(postKey),
+      limit(postsCount)
+    );
 
     const querySnapshot = await getDocs(postsQuery);
     const posts = {};
