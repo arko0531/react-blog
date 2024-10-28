@@ -31,12 +31,10 @@ const SearchBar = ({ setPostKey }) => {
       const searchQuery = query(
         collection(db, 'posts'),
         where('title', '>=', search),
-        where('title', '<=', search + '\uf8ff'), // 검색이 문젠가
+        where('title', '<=', search + '\uf8ff'),
         orderBy('timeStamp', 'desc'),
         limit(6)
       );
-
-      console.log('click');
 
       const querySnapshot = await getDocs(searchQuery);
       const posts = {};
@@ -44,9 +42,10 @@ const SearchBar = ({ setPostKey }) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
 
-      setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]); // 이거 추가하면 검색창 작동 안함 (이거 넣으면 클릭도 늦게됨)
-
-      return posts;
+      return {
+        posts,
+        searchDoc: querySnapshot.docs[querySnapshot.docs.length - 1]
+      };
     },
     enabled: isSearching
   });
@@ -63,7 +62,11 @@ const SearchBar = ({ setPostKey }) => {
     if (isSearching && data) {
       setIsSearching(false);
       setSearch('');
-      const posts = Object.values(data);
+
+      setPostKey(data.searchDoc);
+
+      //console.log(data.searchDoc);
+      const posts = Object.values(data.posts);
       dispatch(postsActions.handleSearchPostsResult(posts));
     }
   }, [data, dispatch, isSearching]);

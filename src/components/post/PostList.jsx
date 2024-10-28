@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
@@ -54,14 +54,23 @@ const PostList = () => {
     if (!postKey) {
       return;
     }
-    const postsQuery = query(
-      collection(db, 'posts'),
-      where('title', '>=', searchValue || ''),
-      where('title', '<=', searchValue || '' + '\uf8ff'),
-      orderBy('timeStamp', 'desc'),
-      startAfter(postKey),
-      limit(postsCount)
-    );
+    // console.log(postKey);
+
+    const postsQuery = searchValue
+      ? query(
+          collection(db, 'posts'),
+          where('title', '>=', searchValue || ''),
+          where('title', '<=', searchValue + '\uf8ff'),
+          orderBy('timeStamp', 'desc'),
+          startAfter(postKey),
+          limit(postsCount)
+        )
+      : query(
+          collection(db, 'posts'),
+          orderBy('timeStamp', 'desc'),
+          startAfter(postKey),
+          limit(postsCount)
+        );
 
     const querySnapshot = await getDocs(postsQuery);
     const posts = {};
@@ -69,10 +78,12 @@ const PostList = () => {
       posts[doc.id] = { id: doc.id, ...doc.data() };
     });
 
-    if (querySnapshot.empty === 0) {
+    if (querySnapshot.empty) {
       return;
     }
     setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+
+    console.log(posts);
 
     return posts;
   };
@@ -86,10 +97,13 @@ const PostList = () => {
       const morePost = await loadMore();
       if (morePost) {
         const newPosts = Object.values(morePost);
+
+        console.log('추가 : ' + newPosts);
+
         dispatch(postsActions.handlePostsList(newPosts));
       }
     }
-    // console.log('도달');
+    //console.log('도달');
   };
 
   useEffect(() => {
