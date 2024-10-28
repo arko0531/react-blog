@@ -83,8 +83,6 @@ const PostList = () => {
     }
     setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
-    console.log(posts);
-
     return posts;
   };
 
@@ -97,8 +95,6 @@ const PostList = () => {
       const morePost = await loadMore();
       if (morePost) {
         const newPosts = Object.values(morePost);
-
-        console.log('추가 : ' + newPosts);
 
         dispatch(postsActions.handlePostsList(newPosts));
       }
