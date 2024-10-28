@@ -67,6 +67,10 @@ const PostList = () => {
   };
 
   const loadMore = async () => {
+    if (!key) {
+      return;
+    }
+
     const postsQuery = query(
       collection(db, 'posts'),
       startAfter(key),
@@ -113,12 +117,11 @@ const PostList = () => {
 
   if (posts.length > 0) {
     content = (
-      <PostListWrapper>
+      <>
         {posts.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
-        <End ref={postRef}></End>
-      </PostListWrapper>
+      </>
     );
   } else if (posts.length === 0 && !isLoading) {
     content =
@@ -132,7 +135,10 @@ const PostList = () => {
   return (
     <>
       <Title>POSTS</Title>
-      {content}
+      <PostListWrapper>
+        {content}
+        <End ref={postRef}></End>
+      </PostListWrapper>
     </>
   );
 };
