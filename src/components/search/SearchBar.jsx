@@ -66,7 +66,7 @@ const SearchBar = ({ setPostKey }) => {
       setPostKey(data.searchDoc);
 
       const posts = Object.values(data.posts);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(postsActions.handleStartPostList(posts));
     }
   }, [data, dispatch, isSearching]);
 

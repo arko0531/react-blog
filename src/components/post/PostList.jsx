@@ -104,7 +104,7 @@ const PostList = () => {
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(postsActions.handleStartPostList(posts));
     }
   }, [data, dispatch]);
 
