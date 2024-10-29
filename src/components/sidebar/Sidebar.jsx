@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { authActions } from 'store/reducers/auth';
 import { useDispatch } from 'react-redux';
@@ -9,6 +9,7 @@ import Navigator from 'components/navigator/Navigator';
 import SearchBar from 'components/search/SearchBar';
 
 const SideBar = () => {
+  const [postKey, setPostKey] = useState(null); // 마지막으로 불러온 스냅샷의 개수
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,8 +30,8 @@ const SideBar = () => {
         <Navigator />
       </Side>
       <OutletStyled>
-        <SearchBar />
-        <Outlet />
+        <SearchBar setPostKey={setPostKey} />
+        <Outlet context={{ postKey, setPostKey }} />
       </OutletStyled>
     </Main>
   );
