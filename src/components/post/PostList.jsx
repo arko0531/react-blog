@@ -6,10 +6,10 @@ import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import {
   collection,
-  getCountFromServer,
+  endAt,
+  endBefore,
   getDocs,
   limit,
-  limitToLast,
   orderBy,
   query,
   startAfter,
@@ -20,9 +20,10 @@ import PostCard from 'components/post/card/PostCard';
 import Button from 'components/ui/Button';
 
 const PostList = () => {
-  const { prevPostKey, setPrevPostKey, nextPostKey, setNextPostKey } =
+  const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
     useOutletContext();
   const [isNext, setIsNext] = useState(true); // prev인지 next인지
+  const [page, setPage] = useState(1);
   const postsCount = 6;
   const searchValue = useSelector((state) => state.posts.searchValue);
   const posts = useSelector((state) => state.posts.posts);
@@ -46,7 +47,8 @@ const PostList = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
 
-      setPrevPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setFirstPostKey(querySnapshot.docs[0]);
 
       return posts;
     }
@@ -63,7 +65,7 @@ const PostList = () => {
 
   // prev, next 각각
   const loadMore = async () => {
-    if (!prevPostKey) {
+    if (!lastPostKey) {
       return;
     }
 
@@ -74,7 +76,7 @@ const PostList = () => {
           where('title', '>=', searchValue),
           where('title', '<=', searchValue + '\uf8ff'),
           orderBy('timeStamp', 'desc'),
-          startAfter(prevPostKey),
+          startAfter(lastPostKey),
           limit(postsCount)
         )
       : query(
@@ -83,9 +85,14 @@ const PostList = () => {
           where('title', '>=', searchValue),
           where('title', '<=', searchValue + '\uf8ff'),
           orderBy('timeStamp', 'desc'),
-          startAfter(prevPostKey),
-          limitToLast(postsCount)
+          endBefore(firstPostKey), // 포함 / 마지막 스냅샷 정의
+          limit(postsCount)
         );
+
+    // where 문제는 아님
+    // next는 잘 되는데 prev가 안됨
+    // 키가 이상하게 잡혀있나
+
     const querySnapshot = await getDocs(postsQuery);
     const posts = {};
     querySnapshot.forEach((doc) => {
@@ -96,20 +103,26 @@ const PostList = () => {
       return;
     }
 
-    setPrevPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setFirstPostKey(querySnapshot.docs[0]);
+
+    // console.log(nextPostKey);
+    // console.log(prevPostKey);
 
     return posts;
   };
 
   // prev
   const handlePrevPosts = async () => {
+    if (page <= 1) return;
+
     setIsNext(false);
 
     const morePost = await loadMore();
     if (morePost) {
       const newPosts = Object.values(morePost);
-
       dispatch(postsActions.handlePostsList(newPosts));
+      setPage(page - 1);
     }
   };
 
@@ -120,8 +133,8 @@ const PostList = () => {
     const morePost = await loadMore();
     if (morePost) {
       const newPosts = Object.values(morePost);
-
       dispatch(postsActions.handlePostsList(newPosts));
+      setPage(page + 1);
     }
   };
 
@@ -142,11 +155,19 @@ const PostList = () => {
 
   if (posts.length > 0) {
     content = (
-      <PostListWrapper>
-        {posts.map((post) => (
-          <PostCard key={post.postId} post={post} />
-        ))}
-      </PostListWrapper>
+      <>
+        <PostListWrapper>
+          {posts.map((post) => (
+            <PostCard key={post.postId} post={post} />
+          ))}
+        </PostListWrapper>
+        <Pagination>
+          {page !== 1 && <Button onClick={handlePrevPosts}>Prev</Button>}
+          {posts?.length === 6 && (
+            <Button onClick={handleNextPosts}>Next</Button>
+          )}
+        </Pagination>
+      </>
     );
   } else if (posts.length === 0 && !isLoading) {
     content =
@@ -161,10 +182,6 @@ const PostList = () => {
     <>
       <Title>POSTS</Title>
       {content}
-      <Pagination>
-        <Button onClick={handlePrevPosts}>Prev</Button>
-        <Button onClick={handleNextPosts}>Next</Button>
-      </Pagination>
     </>
   );
 };

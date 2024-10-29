@@ -9,8 +9,8 @@ import Navigator from 'components/navigator/Navigator';
 import SearchBar from 'components/search/SearchBar';
 
 const SideBar = () => {
-  const [prevPostKey, setPrevPostKey] = useState();
-  const [nextPostKey, setNextPostKey] = useState();
+  const [firstPostKey, setFirstPostKey] = useState();
+  const [lastPostKey, setLastPostKey] = useState();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,9 +31,14 @@ const SideBar = () => {
         <Navigator />
       </Side>
       <OutletStyled>
-        <SearchBar setPostKey={setNextPostKey} />
+        <SearchBar setPostKey={setFirstPostKey} />
         <Outlet
-          context={{ prevPostKey, setPrevPostKey, nextPostKey, setNextPostKey }}
+          context={{
+            firstPostKey,
+            setFirstPostKey,
+            lastPostKey,
+            setLastPostKey
+          }}
         />
       </OutletStyled>
     </Main>
