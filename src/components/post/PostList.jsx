@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import { useInView } from 'react-intersection-observer';
@@ -9,8 +9,10 @@ import {
   collection,
   getDocs,
   limit,
+  orderBy,
   query,
-  startAfter
+  startAfter,
+  where
 } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
@@ -19,18 +21,23 @@ const PostList = () => {
   const { ref: postRef, inView } = useInView({
     threshold: 1
   });
-  const [key, setKey] = useState(null);
+  const { postKey, setPostKey } = useOutletContext();
   const postsCount = 6;
 
+  const posts = useSelector((state) => state.posts.posts);
+  const searchValue = useSelector((state) => state.posts.searchValue);
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('mode');
-  const posts = useSelector((state) => state.posts.posts);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const postsQuery = query(collection(db, 'posts'), limit(postsCount));
+      const postsQuery = query(
+        collection(db, 'posts'),
+        orderBy('timeStamp', 'desc'),
+        limit(postsCount)
+      );
 
       const querySnapshot = await getDocs(postsQuery);
       const posts = {};
@@ -38,7 +45,7 @@ const PostList = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
 
-      setKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
       return posts;
     }
@@ -57,23 +64,21 @@ const PostList = () => {
     const morePost = await loadMore();
     if (morePost) {
       const newPosts = Object.values(morePost);
-      dispatch(
-        postsActions.handleSearchPostsResult({
-          posts: newPosts,
-          reset: false
-        })
-      );
+      dispatch(postsActions.handlePostsList(newPosts));
     }
   };
 
   const loadMore = async () => {
-    if (!key) {
+    if (!postKey) {
       return;
     }
 
     const postsQuery = query(
       collection(db, 'posts'),
-      startAfter(key),
+      where('title', '>=', searchValue),
+      where('title', '<=', searchValue + '\uf8ff'),
+      orderBy('timeStamp', 'desc'),
+      startAfter(postKey),
       limit(postsCount)
     );
 
@@ -86,7 +91,7 @@ const PostList = () => {
     if (querySnapshot.empty === 0) {
       return;
     }
-    setKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
     return posts;
   };
@@ -94,9 +99,7 @@ const PostList = () => {
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
-      dispatch(
-        postsActions.handleSearchPostsResult({ posts: posts, reset: true })
-      );
+      dispatch(postsActions.handleStartPostList(posts));
     }
   }, [data]);
 
@@ -135,10 +138,8 @@ const PostList = () => {
   return (
     <>
       <Title>POSTS</Title>
-      <PostListWrapper>
-        {content}
-        <End ref={postRef}></End>
-      </PostListWrapper>
+      <PostListWrapper>{content}</PostListWrapper>
+      <End ref={postRef}></End>
     </>
   );
 };

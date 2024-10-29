@@ -1,17 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = { posts: [] };
+const initialState = { posts: [], searchValue: '' };
 
 const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    handleSearchPostsResult(state, action) {
-      if (action.payload.reset) {
-        state.posts = action.payload.posts;
-      } else {
-        state.posts = [...state.posts, ...action.payload.posts];
-      }
+    handleStartPostList(state, action) {
+      state.posts = action.payload;
+    },
+    handlePostsList(state, action) {
+      state.posts = [...state.posts, ...action.payload];
+    },
+    setSearchValue(state, action) {
+      state.searchValue = action.payload;
     }
   }
 });
