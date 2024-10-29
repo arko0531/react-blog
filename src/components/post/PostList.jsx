@@ -1,29 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import {
+  collection,
+  getCountFromServer,
+  getDocs,
+  limit,
+  limitToLast,
+  orderBy,
+  query,
+  startAfter,
+  where
+} from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 import Button from 'components/ui/Button';
 
 const PostList = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 6;
+  const { prevPostKey, setPrevPostKey, nextPostKey, setNextPostKey } =
+    useOutletContext();
+  const [isNext, setIsNext] = useState(true); // prev인지 next인지
+  const postsCount = 6;
+  const searchValue = useSelector((state) => state.posts.searchValue);
+  const posts = useSelector((state) => state.posts.posts);
 
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('mode');
-  const posts = useSelector((state) => state.posts.posts);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
       const postsQuery = query(
         collection(db, 'posts'),
-        orderBy('timeStamp', 'desc')
+        orderBy('timeStamp', 'desc'),
+        limit(postsCount)
       );
 
       const querySnapshot = await getDocs(postsQuery);
@@ -31,6 +45,8 @@ const PostList = () => {
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
+
+      setPrevPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
       return posts;
     }
@@ -44,14 +60,70 @@ const PostList = () => {
   }, [data]);
 
   // 페이지네이션
-  const lastPage = currentPage * postsPerPage;
-  const firstPage = lastPage - postsPerPage;
-  const currentPosts = posts?.slice(firstPage, lastPage); // 전체 게시물 중에서 현재 페이지 게시물들만 슬라이스
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(posts.length / postsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  // prev, next 각각
+  const loadMore = async () => {
+    if (!prevPostKey) {
+      return;
+    }
+
+    const postsQuery = isNext
+      ? query(
+          // next
+          collection(db, 'posts'),
+          where('title', '>=', searchValue),
+          where('title', '<=', searchValue + '\uf8ff'),
+          orderBy('timeStamp', 'desc'),
+          startAfter(prevPostKey),
+          limit(postsCount)
+        )
+      : query(
+          // prev
+          collection(db, 'posts'),
+          where('title', '>=', searchValue),
+          where('title', '<=', searchValue + '\uf8ff'),
+          orderBy('timeStamp', 'desc'),
+          startAfter(prevPostKey),
+          limitToLast(postsCount)
+        );
+    const querySnapshot = await getDocs(postsQuery);
+    const posts = {};
+    querySnapshot.forEach((doc) => {
+      posts[doc.id] = { id: doc.id, ...doc.data() };
+    });
+
+    if (querySnapshot.empty) {
+      return;
+    }
+
+    setPrevPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+
+    return posts;
+  };
+
+  // prev
+  const handlePrevPosts = async () => {
+    setIsNext(false);
+
+    const morePost = await loadMore();
+    if (morePost) {
+      const newPosts = Object.values(morePost);
+
+      dispatch(postsActions.handlePostsList(newPosts));
+    }
+  };
+
+  // next
+  const handleNextPosts = async () => {
+    setIsNext(true);
+
+    const morePost = await loadMore();
+    if (morePost) {
+      const newPosts = Object.values(morePost);
+
+      dispatch(postsActions.handlePostsList(newPosts));
+    }
+  };
 
   let content;
 
@@ -68,15 +140,15 @@ const PostList = () => {
     );
   }
 
-  if (currentPosts.length > 0) {
+  if (posts.length > 0) {
     content = (
       <PostListWrapper>
-        {currentPosts.map((post) => (
+        {posts.map((post) => (
           <PostCard key={post.postId} post={post} />
         ))}
       </PostListWrapper>
     );
-  } else if (currentPosts.length === 0 && !isLoading) {
+  } else if (posts.length === 0 && !isLoading) {
     content =
       search === 'search' ? (
         <p>검색 결과가 없습니다.</p>
@@ -90,15 +162,8 @@ const PostList = () => {
       <Title>POSTS</Title>
       {content}
       <Pagination>
-        {pageNumbers.map((number) => (
-          <Button
-            key={number}
-            $width="40"
-            onClick={() => setCurrentPage(number)}
-          >
-            {number}
-          </Button>
-        ))}
+        <Button onClick={handlePrevPosts}>Prev</Button>
+        <Button onClick={handleNextPosts}>Next</Button>
       </Pagination>
     </>
   );
@@ -123,6 +188,6 @@ const Title = styled.h1`
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   margin-top: 20px;
 `;

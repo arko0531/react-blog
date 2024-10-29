@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = { posts: [] };
+const initialState = { posts: [], searchValue: '' };
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -8,6 +8,9 @@ const postsSlice = createSlice({
   reducers: {
     handlePostsList(state, action) {
       state.posts = action.payload;
+    },
+    setSearchValue(state, action) {
+      state.searchValue = action.payload;
     }
   }
 });
