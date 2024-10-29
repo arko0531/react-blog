@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from 'firebase.js';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
+import { getPostingDate } from 'util/dateFormat';
 import Button from 'components/ui/Button';
 import Modal from 'components/modal/Modal';
 
@@ -73,11 +74,13 @@ const DetailPostPage = () => {
   }
 
   if (data) {
+    const date = getPostingDate(data.timeStamp);
+
     content = (
       <>
         <h1>{data.title}</h1>
         <PostingDate>작성자 : {data.userEmail}</PostingDate>
-        <PostingDate>작성일 : {data.postingDate}</PostingDate>
+        <PostingDate>작성일 : {date}</PostingDate>
         <div>
           <ImgBox src={data.imageURL} alt="post image" />
           <br />

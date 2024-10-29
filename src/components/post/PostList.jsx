@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 import Button from 'components/ui/Button';
@@ -21,11 +21,17 @@ const PostList = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const querySnapshot = await getDocs(collection(db, 'posts'));
+      const postsQuery = query(
+        collection(db, 'posts'),
+        orderBy('timeStamp', 'desc')
+      );
+
+      const querySnapshot = await getDocs(postsQuery);
       const posts = {};
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
+
       return posts;
     }
   });
@@ -33,7 +39,7 @@ const PostList = () => {
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(postsActions.handlePostsList(posts));
     }
   }, [data]);
 
