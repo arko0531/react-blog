@@ -13,6 +13,7 @@ import {
   orderBy,
   query,
   startAfter,
+  startAt,
   where
 } from 'firebase/firestore';
 import { db } from 'firebase.js';
@@ -48,7 +49,7 @@ const PostList = () => {
       });
 
       setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setFirstPostKey(querySnapshot.docs[0]);
+      // setFirstPostKey(querySnapshot.docs[0]);
 
       return posts;
     }
@@ -85,7 +86,7 @@ const PostList = () => {
           where('title', '>=', searchValue),
           where('title', '<=', searchValue + '\uf8ff'),
           orderBy('timeStamp', 'desc'),
-          endBefore(firstPostKey), // 포함 / 마지막 스냅샷 정의
+          endBefore(firstPostKey),
           limit(postsCount)
         );
 
@@ -103,6 +104,15 @@ const PostList = () => {
       return;
     }
 
+    // 이건 잘 맞음
+    // console.log(
+    //   querySnapshot.docs[querySnapshot.docs.length - 1]._document.data.value
+    //     .mapValue.fields
+    // );
+
+    // 이거도 잘 맞음
+    console.log(querySnapshot.docs[0]._document.data.value.mapValue.fields);
+
     setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstPostKey(querySnapshot.docs[0]);
 
@@ -114,8 +124,6 @@ const PostList = () => {
 
   // prev
   const handlePrevPosts = async () => {
-    if (page <= 1) return;
-
     setIsNext(false);
 
     const morePost = await loadMore();
