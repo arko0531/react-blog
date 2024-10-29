@@ -36,7 +36,6 @@ const PostForm = () => {
     mutationFn: async ({
       title,
       content,
-      postingDate,
       userEmail,
       postId,
       imageURL,
@@ -46,7 +45,6 @@ const PostForm = () => {
       const postingData = await setDoc(doc(db, 'posts', postId), {
         title,
         content,
-        postingDate,
         userEmail,
         postId,
         imageURL,
@@ -119,11 +117,9 @@ const PostForm = () => {
     const imageName = fileName; // 이름
 
     // 날짜
-    const date = getPostingDate();
 
     const title = e.target.title.value;
     const content = e.target.content.value;
-    const postingDate = date;
     const userEmail = user.email;
     const postId = params.postId ? params.postId : uuidv4();
     const timeStamp = Number(new Date());
@@ -131,7 +127,6 @@ const PostForm = () => {
     mutate({
       title,
       content,
-      postingDate,
       userEmail,
       postId,
       imageURL,
@@ -171,16 +166,6 @@ const PostForm = () => {
         inputEl.current.removeEventListener('input', handleFileInput);
     };
   }, [inputEl, handleFileInput]);
-
-  const getPostingDate = () => {
-    // 날짜 설정
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = ('0' + (today.getMonth() + 1)).slice(-2);
-    const day = ('0' + today.getDate()).slice(-2);
-
-    return year + '년 ' + month + '월 ' + day + '일';
-  };
 
   const handleCancel = () => {
     navigate(-1);
