@@ -6,7 +6,7 @@ import { Outlet } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from 'firebase.js';
 import Navigator from 'components/navigator/Navigator';
-import SearchBar from 'components/search/SearchBar';
+import Search from 'components/search/Search';
 
 const SideBar = () => {
   const [firstPostKey, setFirstPostKey] = useState();
@@ -31,7 +31,7 @@ const SideBar = () => {
         <Navigator />
       </Side>
       <OutletStyled>
-        <SearchBar setLastPostKey={setLastPostKey} />
+        <Search setLastPostKey={setLastPostKey} />
         <Outlet
           context={{
             firstPostKey,

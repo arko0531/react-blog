@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { auth, db } from 'firebase.js';
 import { signOut } from 'firebase/auth';
@@ -10,7 +10,6 @@ import { queryClient } from 'util/http';
 
 const Navigator = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const isLogin = useSelector((state) => state.auth.isLogin);
 
   const user = auth.currentUser;

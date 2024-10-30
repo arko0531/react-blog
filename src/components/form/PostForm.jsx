@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -19,8 +19,11 @@ import {
   getDocs
 } from 'firebase/firestore';
 import { db, auth } from 'firebase.js';
-import Input from 'components/ui/Input';
-import Button from 'components/ui/Button';
+import Input from 'components/ui/input/Input';
+import Button from 'components/ui/button/Button';
+import FileInput from 'components/ui/input/FileInput';
+import FormTitle from 'components/title/FormTitle';
+import TextArea from 'components/ui/textArea/TextArea';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
@@ -116,8 +119,6 @@ const PostForm = () => {
 
     const imageName = fileName; // 이름
 
-    // 날짜
-
     const title = e.target.title.value;
     const content = e.target.content.value;
     const userEmail = user.email;
@@ -138,44 +139,14 @@ const PostForm = () => {
     setFileName('');
   };
 
-  const handleFileInput = useCallback((e) => {
-    const files = e.target.files;
-    const theFile = files[0]; // file url
-
-    // file name
-    if (files && files[0]) {
-      setFileName(e.target.files[0].name);
-    }
-
-    const reader = new FileReader();
-
-    reader.onloadend = (finishedEvent) => {
-      const result = finishedEvent.currentTarget.result;
-      setAttachment(result);
-    };
-
-    reader.readAsDataURL(theFile);
-  }, []);
-
-  useEffect(() => {
-    if (inputEl.current !== null) {
-      inputEl.current.addEventListener('input', handleFileInput);
-    }
-    return () => {
-      inputEl.current &&
-        inputEl.current.removeEventListener('input', handleFileInput);
-    };
-  }, [inputEl, handleFileInput]);
-
   const handleCancel = () => {
     navigate(-1);
   };
 
   return (
     <Wrapper>
+      <FormTitle>{postData ? '게시글 수정' : '새 게시글 작성'}</FormTitle>
       <StyledPostForm onSubmit={handleWritePost}>
-        <PostTitle>{postData ? '게시글 수정' : '새 게시글 작성'}</PostTitle>
-
         <Input
           label="제목"
           type="text"
@@ -185,33 +156,23 @@ const PostForm = () => {
           placeholder="제목을 입력해주세요."
           required
         />
-        <TextAreaWrapper>
-          <TextLabel>내용</TextLabel>
-          <TextArea
-            label="내용"
-            type="text"
-            id="content"
-            $width="100%"
-            $height="400px"
-            placeholder="내용을 입력해주세요."
-            defaultValue={postData?.content || ''}
-            required
-          />
-        </TextAreaWrapper>
 
-        <FileContainer>
-          <label htmlFor="file">
-            <InputFile>
-              <AttachmentButton>🔗 FILE UPLOAD</AttachmentButton>
-              {fileName ? (
-                <AttachedFile className="file-name">{fileName}</AttachedFile>
-              ) : (
-                ''
-              )}
-            </InputFile>
-          </label>
-          <NoneInput type="file" id="file" accept="image/*" ref={inputEl} />
-        </FileContainer>
+        <TextArea
+          label="내용"
+          id="content"
+          $width="100%"
+          $height="400px"
+          placeholder="내용을 입력해주세요."
+          defaultValue={postData?.content || ''}
+          required
+        />
+
+        <FileInput
+          inputEl={inputEl}
+          fileName={fileName}
+          setFileName={setFileName}
+          setAttachment={setAttachment}
+        />
 
         <ButtonWrapper>
           <Button type="submit"> 작성</Button>
@@ -241,13 +202,6 @@ const StyledPostForm = styled.form`
   width: 100%;
 `;
 
-const PostTitle = styled.p`
-  font-size: 30px;
-  font-weight: 500;
-  margin-bottom: 50px;
-  text-align: center;
-`;
-
 const ButtonWrapper = styled.div`
   display: flex;
   margin-top: 40px;
@@ -255,63 +209,22 @@ const ButtonWrapper = styled.div`
   gap: 20px;
 `;
 
-const TextArea = styled.textarea`
-  padding: 10px;
-  border: none;
-  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
+// const TextArea = styled.textarea`
+//   padding: 10px;
+//   border: none;
+//   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
 
-  width: ${({ $width }) => ($width ? `${$width}` : '400px')};
-  height: ${({ $height }) => ($height ? `${$height}` : '40px')};
-`;
+//   width: ${({ $width }) => ($width ? `${$width}` : '400px')};
+//   height: ${({ $height }) => ($height ? `${$height}` : '40px')};
+// `;
 
-const TextLabel = styled.label`
-  font-size: 18px;
-  margin-top: 20px;
-`;
+// const TextLabel = styled.label`
+//   font-size: 18px;
+//   margin-top: 20px;
+// `;
 
-const TextAreaWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-// 파일 커스텀
-const FileContainer = styled.section`
-  display: flex;
-  flex-direction: column;
-  margin-top: 40px;
-  width: 400px;
-`;
-
-const InputFile = styled.div`
-  display: flex;
-  gap: 16px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 16px;
-  width: 400px;
-`;
-
-const NoneInput = styled.input`
-  display: none;
-`;
-
-const AttachmentButton = styled.div`
-  width: fit-content;
-  padding: 16px;
-  background-color: #191b27;
-  border-radius: 12px;
-  color: white;
-  font-weight: bold;
-  width: 210px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  cursor: pointer;
-`;
-
-const AttachedFile = styled.p`
-  font-size: 16px;
-  font-weight: 500;
-  color: #999;
-`;
+// const TextAreaWrapper = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   gap: 10px;
+// `;

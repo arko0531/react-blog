@@ -1,4 +1,4 @@
-import Input from 'components/ui/Input';
+import Input from 'components/ui/input/Input';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
@@ -11,8 +11,9 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth } from 'firebase.js';
-import Button from 'components/ui/Button';
+import Button from 'components/ui/button/Button';
 import googleLogo from 'assets/google-logo.png';
+import FormTitle from 'components/title/FormTitle';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
@@ -101,8 +102,8 @@ const AuthForm = () => {
 
   return (
     <>
+      <FormTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</FormTitle>
       <StyledAuthForm id="authForm" onSubmit={handleAuth}>
-        <AuthTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</AuthTitle>
         <Input
           label="E-mail"
           type="email"
@@ -158,12 +159,6 @@ const AuthForm = () => {
 };
 
 export default AuthForm;
-
-const AuthTitle = styled.p`
-  font-size: 30px;
-  font-weight: 500;
-  margin-bottom: 50px;
-`;
 
 const StyledAuthForm = styled.form`
   display: flex;

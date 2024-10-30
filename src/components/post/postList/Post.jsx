@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import {
   collection,
-  endAt,
   endBefore,
   getDocs,
   limit,
@@ -17,10 +15,10 @@ import {
   where
 } from 'firebase/firestore';
 import { db } from 'firebase.js';
-import PostCard from 'components/post/card/PostCard';
-import Button from 'components/ui/Button';
+import PostList from 'components/post/postList/PostList';
+import MainTitle from 'components/title/MainTitle';
 
-const PostList = () => {
+const Post = () => {
   const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
     useOutletContext();
   const [page, setPage] = useState(1);
@@ -31,8 +29,6 @@ const PostList = () => {
   const posts = useSelector((state) => state.posts.posts);
 
   const dispatch = useDispatch();
-  const [searchParams] = useSearchParams();
-  const search = searchParams.get('mode');
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
@@ -77,25 +73,15 @@ const PostList = () => {
       return;
     }
 
-    const postsQuery = isNext
-      ? query(
-          // next
-          collection(db, 'posts'),
-          where('title', '>=', searchValue),
-          where('title', '<=', searchValue + '\uf8ff'),
-          orderBy('timeStamp', 'desc'),
-          startAfter(lastPostKey),
-          limit(postsCount)
-        )
-      : query(
-          // prev
-          collection(db, 'posts'),
-          where('title', '>=', searchValue),
-          where('title', '<=', searchValue + '\uf8ff'),
-          orderBy('timeStamp', 'desc'),
-          endBefore(firstPostKey),
-          limitToLast(postsCount)
-        );
+    const postsQuery = query(
+      // next
+      collection(db, 'posts'),
+      where('title', '>=', searchValue),
+      where('title', '<=', searchValue + '\uf8ff'),
+      orderBy('timeStamp', 'desc'),
+      isNext ? startAfter(lastPostKey) : endBefore(firstPostKey),
+      isNext ? limit(postsCount) : limitToLast(postsCount)
+    );
 
     const querySnapshot = await getDocs(postsQuery);
     const posts = {};
@@ -104,7 +90,6 @@ const PostList = () => {
     });
 
     if (querySnapshot.empty) {
-      console.log('비어있음');
       return;
     }
 
@@ -137,83 +122,31 @@ const PostList = () => {
     }
   };
 
-  let content;
+  if (isLoading) return <p>로딩 중...</p>;
 
-  if (isLoading) {
-    content = <p>로딩 중...</p>;
-  }
-
-  if (error) {
-    content = (
-      <>
-        <p>오류가 발생했습니다.</p>
-        <p> {error.message}</p>
-      </>
-    );
-  }
-
-  if (posts.length > 0) {
-    content = (
-      <>
-        <PostListWrapper>
-          {posts.map((post) => (
-            <PostCard key={post.postId} post={post} />
-          ))}
-        </PostListWrapper>
-        <Pagination>
-          <Button
-            onClick={handlePrevPosts}
-            disabled={page === 1}
-            $disabled={page === 1}
-          >
-            Prev
-          </Button>
-          <Button
-            onClick={handleNextPosts}
-            disabled={posts?.length !== 6}
-            $disabled={posts?.length !== 6}
-          >
-            Next
-          </Button>
-        </Pagination>
-      </>
-    );
-  } else if (posts.length === 0 && !isLoading) {
-    content =
-      search === 'search' ? (
-        <p>검색 결과가 없습니다.</p>
-      ) : (
-        <p>현재 게시글이 없습니다.</p>
-      );
+  if (posts.length === 0) {
+    if (searchValue === '') return <p>현재 게시글이 없습니다.</p>;
+    return <p>검색 결과가 없습니다.</p>;
   }
 
   return (
     <>
-      <Title>POSTS</Title>
-      {content}
+      <MainTitle>{searchValue === '' ? 'POSTS' : '검색 결과'}</MainTitle>
+      {error ? (
+        <>
+          <p>오류가 발생했습니다.</p>
+          <p> {error.message}</p>
+        </>
+      ) : (
+        <PostList
+          posts={posts}
+          onPrevClick={handlePrevPosts}
+          onNextClick={handleNextPosts}
+          page={page}
+        />
+      )}
     </>
   );
 };
 
-export default PostList;
-
-const PostListWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 70px;
-  flex-grow: 1;
-  justify-content: start;
-  flex-flow: row wrap;
-`;
-
-const Title = styled.h1`
-  font-size: 30px;
-  font-weight: 500;
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 20px;
-`;
+export default Post;
