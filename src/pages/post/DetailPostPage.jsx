@@ -15,7 +15,7 @@ import {
 import { auth, db } from 'firebase.js';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
 import { getPostingDate } from 'util/dateFormat';
-import Button from 'components/ui/Button';
+import Button from 'components/ui/button/Button';
 import Modal from 'components/modal/Modal';
 
 const DetailPostPage = () => {

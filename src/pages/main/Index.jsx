@@ -1,9 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import PostList from 'components/post/PostList';
-import Button from 'components/ui/Button';
+import Post from 'components/post/postList/Post';
+import CreatePostButton from 'components/post/button/CreatePostButton';
 
 const MainPostPage = () => {
   const navigate = useNavigate();
@@ -15,18 +14,11 @@ const MainPostPage = () => {
 
   return (
     <>
-      <ButtonWrapper>
-        {isLogin && <Button onClick={handleWritePost}>New</Button>}
-      </ButtonWrapper>
+      {isLogin && <CreatePostButton onWritePost={handleWritePost} />}
 
-      <PostList />
+      <Post />
     </>
   );
 };
 
 export default MainPostPage;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  justify-content: end;
-`;
