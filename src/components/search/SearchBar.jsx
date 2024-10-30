@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import Button from 'components/ui/Button';
 
@@ -23,7 +23,8 @@ const SearchBar = () => {
       const searchQuery = query(
         collection(db, 'posts'),
         where('title', '>=', searchValue),
-        where('title', '<=', searchValue + '\uf8ff')
+        where('title', '<=', searchValue + '\uf8ff'),
+        orderBy('timeStamp', 'desc')
       );
 
       const querySnapshot = await getDocs(searchQuery);
@@ -48,7 +49,7 @@ const SearchBar = () => {
       setIsSearching(false);
       setSearch('');
       const posts = Object.values(data);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(postsActions.handlePostsList(posts));
     }
   }, [data, dispatch, isSearching]);
 

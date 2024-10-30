@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from 'react-js-pagination';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, orderBy } from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 
@@ -21,7 +21,10 @@ const PostList = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
-      const querySnapshot = await getDocs(collection(db, 'posts'));
+      const querySnapshot = await getDocs(
+        collection(db, 'posts'),
+        orderBy('timeStamp', 'desc')
+      );
       const posts = {};
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
@@ -33,7 +36,7 @@ const PostList = () => {
   useEffect(() => {
     if (data) {
       const posts = Object.values(data);
-      dispatch(postsActions.handleSearchPostsResult(posts));
+      dispatch(postsActions.handlePostsList(posts));
     }
   }, [data]);
 
