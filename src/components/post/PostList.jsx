@@ -10,10 +10,10 @@ import {
   endBefore,
   getDocs,
   limit,
+  limitToLast,
   orderBy,
   query,
   startAfter,
-  startAt,
   where
 } from 'firebase/firestore';
 import { db } from 'firebase.js';
@@ -23,8 +23,9 @@ import Button from 'components/ui/Button';
 const PostList = () => {
   const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
     useOutletContext();
-  const [isNext, setIsNext] = useState(true); // prev인지 next인지
   const [page, setPage] = useState(1);
+  const [snapshotLength, setSnapshotLength] = useState(null);
+
   const postsCount = 6;
   const searchValue = useSelector((state) => state.posts.searchValue);
   const posts = useSelector((state) => state.posts.posts);
@@ -49,7 +50,9 @@ const PostList = () => {
       });
 
       setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      // setFirstPostKey(querySnapshot.docs[0]);
+      setFirstPostKey(querySnapshot.docs[0]);
+
+      setSnapshotLength(querySnapshot.length);
 
       return posts;
     }
@@ -65,8 +68,13 @@ const PostList = () => {
   // 페이지네이션
 
   // prev, next 각각
-  const loadMore = async () => {
-    if (!lastPostKey) {
+  const loadMore = async (isNext) => {
+    if (!lastPostKey || !firstPostKey) {
+      return;
+    }
+
+    console.log(snapshotLength);
+    if (snapshotLength < 6) {
       return;
     }
 
@@ -87,7 +95,7 @@ const PostList = () => {
           where('title', '<=', searchValue + '\uf8ff'),
           orderBy('timeStamp', 'desc'),
           endBefore(firstPostKey),
-          limit(postsCount)
+          limitToLast(postsCount)
         );
 
     // where 문제는 아님
@@ -101,32 +109,27 @@ const PostList = () => {
     });
 
     if (querySnapshot.empty) {
+      console.log('비어있음');
       return;
     }
-
-    // 이건 잘 맞음
+    // console.log(isNext);
     // console.log(
     //   querySnapshot.docs[querySnapshot.docs.length - 1]._document.data.value
     //     .mapValue.fields
     // );
-
-    // 이거도 잘 맞음
-    console.log(querySnapshot.docs[0]._document.data.value.mapValue.fields);
+    // console.log(querySnapshot.docs[0]._document.data.value.mapValue.fields);
 
     setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstPostKey(querySnapshot.docs[0]);
 
-    // console.log(nextPostKey);
-    // console.log(prevPostKey);
+    setSnapshotLength(querySnapshot.length);
 
     return posts;
   };
 
   // prev
   const handlePrevPosts = async () => {
-    setIsNext(false);
-
-    const morePost = await loadMore();
+    const morePost = await loadMore(false);
     if (morePost) {
       const newPosts = Object.values(morePost);
       dispatch(postsActions.handlePostsList(newPosts));
@@ -136,9 +139,7 @@ const PostList = () => {
 
   // next
   const handleNextPosts = async () => {
-    setIsNext(true);
-
-    const morePost = await loadMore();
+    const morePost = await loadMore(true);
     if (morePost) {
       const newPosts = Object.values(morePost);
       dispatch(postsActions.handlePostsList(newPosts));
