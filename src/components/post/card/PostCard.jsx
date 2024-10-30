@@ -1,8 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
+import { getPostingDate } from 'util/dateFormat';
 
 const PostCard = ({ post }) => {
+  const date = getPostingDate(post.timeStamp);
+
   return (
     <PostBox>
       <Link to={`/posts/${post.postId}`}>
@@ -12,7 +15,7 @@ const PostCard = ({ post }) => {
           <br />
           <h2>{post.title}</h2>
           <br />
-          <p>{post.postingDate} </p>
+          <p>{date} </p>
         </div>
       </Link>
     </PostBox>
