@@ -12,7 +12,8 @@ const Button = ({ type, onClick, children, ...props }) => {
 export default Button;
 
 const StyledButton = styled.button`
-  background-color: ${({ $bgColor }) => ($bgColor ? $bgColor : '#ffdd1ef9')};
+  background-color: ${({ $bgColor, $disabled }) =>
+    $bgColor ? $bgColor : $disabled ? '#d9d9d9f8' : '#ffdd1ef9'};
   width: ${({ $width }) => ($width ? `${$width}px` : '100px')};
   color: ${({ $color }) => ($color ? `${$color}` : 'black')};
   border-radius: 10px;
@@ -25,7 +26,7 @@ const StyledButton = styled.button`
   cursor: pointer;
 
   &:hover {
-    background-color: ${({ $bgColor }) =>
-      !$bgColor || 'white' ? '#f9bb03' : '#4e7cd6'};
+    background-color: ${({ $bgColor, $disabled }) =>
+      $disabled ? 'none' : !$bgColor || 'white' ? '#f9bb03' : '#4e7cd6'};
   }
 `;

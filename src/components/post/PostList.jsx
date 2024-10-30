@@ -161,10 +161,20 @@ const PostList = () => {
           ))}
         </PostListWrapper>
         <Pagination>
-          {page !== 1 && <Button onClick={handlePrevPosts}>Prev</Button>}
-          {posts?.length === 6 && (
-            <Button onClick={handleNextPosts}>Next</Button>
-          )}
+          <Button
+            onClick={handlePrevPosts}
+            disabled={page === 1}
+            $disabled={page === 1}
+          >
+            Prev
+          </Button>
+          <Button
+            onClick={handleNextPosts}
+            disabled={posts?.length !== 6}
+            $disabled={posts?.length !== 6}
+          >
+            Next
+          </Button>
         </Pagination>
       </>
     );
