@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { authActions } from 'store/reducers/auth';
 import { useDispatch } from 'react-redux';
@@ -9,6 +9,8 @@ import Navigator from 'components/navigator/Navigator';
 import SearchBar from 'components/search/SearchBar';
 
 const SideBar = () => {
+  const [firstPostKey, setFirstPostKey] = useState();
+  const [lastPostKey, setLastPostKey] = useState();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,8 +31,15 @@ const SideBar = () => {
         <Navigator />
       </Side>
       <OutletStyled>
-        <SearchBar />
-        <Outlet />
+        <SearchBar setPostKey={setFirstPostKey} />
+        <Outlet
+          context={{
+            firstPostKey,
+            setFirstPostKey,
+            lastPostKey,
+            setLastPostKey
+          }}
+        />
       </OutletStyled>
     </Main>
   );

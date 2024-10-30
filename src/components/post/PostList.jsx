@@ -1,29 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import {
+  collection,
+  endAt,
+  endBefore,
+  getDocs,
+  limit,
+  limitToLast,
+  orderBy,
+  query,
+  startAfter,
+  where
+} from 'firebase/firestore';
 import { db } from 'firebase.js';
 import PostCard from 'components/post/card/PostCard';
 import Button from 'components/ui/Button';
 
 const PostList = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 6;
+  const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
+    useOutletContext();
+  const [page, setPage] = useState(1);
+  const [snapshotLength, setSnapshotLength] = useState(null);
+
+  const postsCount = 6;
+  const searchValue = useSelector((state) => state.posts.searchValue);
+  const posts = useSelector((state) => state.posts.posts);
 
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
   const search = searchParams.get('mode');
-  const posts = useSelector((state) => state.posts.posts);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
     queryFn: async () => {
       const postsQuery = query(
         collection(db, 'posts'),
-        orderBy('timeStamp', 'desc')
+        orderBy('timeStamp', 'desc'),
+        limit(postsCount)
       );
 
       const querySnapshot = await getDocs(postsQuery);
@@ -31,6 +48,11 @@ const PostList = () => {
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
+
+      setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setFirstPostKey(querySnapshot.docs[0]);
+
+      setSnapshotLength(querySnapshot.length);
 
       return posts;
     }
@@ -44,14 +66,86 @@ const PostList = () => {
   }, [data]);
 
   // 페이지네이션
-  const lastPage = currentPage * postsPerPage;
-  const firstPage = lastPage - postsPerPage;
-  const currentPosts = posts?.slice(firstPage, lastPage); // 전체 게시물 중에서 현재 페이지 게시물들만 슬라이스
 
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(posts.length / postsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  // prev, next 각각
+  const loadMore = async (isNext) => {
+    if (!lastPostKey || !firstPostKey) {
+      return;
+    }
+
+    console.log(snapshotLength);
+    if (snapshotLength < 6) {
+      return;
+    }
+
+    const postsQuery = isNext
+      ? query(
+          // next
+          collection(db, 'posts'),
+          where('title', '>=', searchValue),
+          where('title', '<=', searchValue + '\uf8ff'),
+          orderBy('timeStamp', 'desc'),
+          startAfter(lastPostKey),
+          limit(postsCount)
+        )
+      : query(
+          // prev
+          collection(db, 'posts'),
+          where('title', '>=', searchValue),
+          where('title', '<=', searchValue + '\uf8ff'),
+          orderBy('timeStamp', 'desc'),
+          endBefore(firstPostKey),
+          limitToLast(postsCount)
+        );
+
+    // where 문제는 아님
+    // next는 잘 되는데 prev가 안됨
+    // 키가 이상하게 잡혀있나
+
+    const querySnapshot = await getDocs(postsQuery);
+    const posts = {};
+    querySnapshot.forEach((doc) => {
+      posts[doc.id] = { id: doc.id, ...doc.data() };
+    });
+
+    if (querySnapshot.empty) {
+      console.log('비어있음');
+      return;
+    }
+    // console.log(isNext);
+    // console.log(
+    //   querySnapshot.docs[querySnapshot.docs.length - 1]._document.data.value
+    //     .mapValue.fields
+    // );
+    // console.log(querySnapshot.docs[0]._document.data.value.mapValue.fields);
+
+    setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+    setFirstPostKey(querySnapshot.docs[0]);
+
+    setSnapshotLength(querySnapshot.length);
+
+    return posts;
+  };
+
+  // prev
+  const handlePrevPosts = async () => {
+    const morePost = await loadMore(false);
+    if (morePost) {
+      const newPosts = Object.values(morePost);
+      dispatch(postsActions.handlePostsList(newPosts));
+      setPage(page - 1);
+    }
+  };
+
+  // next
+  const handleNextPosts = async () => {
+    const morePost = await loadMore(true);
+    if (morePost) {
+      const newPosts = Object.values(morePost);
+      dispatch(postsActions.handlePostsList(newPosts));
+      setPage(page + 1);
+    }
+  };
 
   let content;
 
@@ -68,15 +162,23 @@ const PostList = () => {
     );
   }
 
-  if (currentPosts.length > 0) {
+  if (posts.length > 0) {
     content = (
-      <PostListWrapper>
-        {currentPosts.map((post) => (
-          <PostCard key={post.postId} post={post} />
-        ))}
-      </PostListWrapper>
+      <>
+        <PostListWrapper>
+          {posts.map((post) => (
+            <PostCard key={post.postId} post={post} />
+          ))}
+        </PostListWrapper>
+        <Pagination>
+          {page !== 1 && <Button onClick={handlePrevPosts}>Prev</Button>}
+          {posts?.length === 6 && (
+            <Button onClick={handleNextPosts}>Next</Button>
+          )}
+        </Pagination>
+      </>
     );
-  } else if (currentPosts.length === 0 && !isLoading) {
+  } else if (posts.length === 0 && !isLoading) {
     content =
       search === 'search' ? (
         <p>검색 결과가 없습니다.</p>
@@ -89,17 +191,6 @@ const PostList = () => {
     <>
       <Title>POSTS</Title>
       {content}
-      <Pagination>
-        {pageNumbers.map((number) => (
-          <Button
-            key={number}
-            $width="40"
-            onClick={() => setCurrentPage(number)}
-          >
-            {number}
-          </Button>
-        ))}
-      </Pagination>
     </>
   );
 };
@@ -123,6 +214,6 @@ const Title = styled.h1`
 const Pagination = styled.div`
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 30px;
   margin-top: 20px;
 `;

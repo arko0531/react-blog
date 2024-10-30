@@ -26,6 +26,6 @@ const StyledButton = styled.button`
 
   &:hover {
     background-color: ${({ $bgColor }) =>
-      !$bgColor || 'white' ? '#ffe554f8' : '#4e7cd6'};
+      !$bgColor || 'white' ? '#f9bb03' : '#4e7cd6'};
   }
 `;
