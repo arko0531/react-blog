@@ -73,7 +73,6 @@ const PostList = () => {
       return;
     }
 
-    console.log(snapshotLength);
     if (snapshotLength < 6) {
       return;
     }
@@ -98,10 +97,6 @@ const PostList = () => {
           limitToLast(postsCount)
         );
 
-    // where 문제는 아님
-    // next는 잘 되는데 prev가 안됨
-    // 키가 이상하게 잡혀있나
-
     const querySnapshot = await getDocs(postsQuery);
     const posts = {};
     querySnapshot.forEach((doc) => {
@@ -112,16 +107,9 @@ const PostList = () => {
       console.log('비어있음');
       return;
     }
-    // console.log(isNext);
-    // console.log(
-    //   querySnapshot.docs[querySnapshot.docs.length - 1]._document.data.value
-    //     .mapValue.fields
-    // );
-    // console.log(querySnapshot.docs[0]._document.data.value.mapValue.fields);
 
     setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstPostKey(querySnapshot.docs[0]);
-
     setSnapshotLength(querySnapshot.length);
 
     return posts;
@@ -130,6 +118,7 @@ const PostList = () => {
   // prev
   const handlePrevPosts = async () => {
     const morePost = await loadMore(false);
+
     if (morePost) {
       const newPosts = Object.values(morePost);
       dispatch(postsActions.handlePostsList(newPosts));
@@ -140,6 +129,7 @@ const PostList = () => {
   // next
   const handleNextPosts = async () => {
     const morePost = await loadMore(true);
+
     if (morePost) {
       const newPosts = Object.values(morePost);
       dispatch(postsActions.handlePostsList(newPosts));
