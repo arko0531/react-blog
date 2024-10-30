@@ -31,7 +31,7 @@ const SideBar = () => {
         <Navigator />
       </Side>
       <OutletStyled>
-        <SearchBar setPostKey={setFirstPostKey} />
+        <SearchBar setLastPostKey={setLastPostKey} />
         <Outlet
           context={{
             firstPostKey,
