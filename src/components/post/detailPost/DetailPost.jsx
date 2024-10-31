@@ -59,6 +59,7 @@ const DetailPost = () => {
 
   const handleDelete = async () => {
     const postDocRef = doc(db, 'posts', data.id);
+
     try {
       const imageRef = ref(getStorage(), data.imageURL);
       mutate({ postDocRef, imageRef });
