@@ -11,8 +11,6 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth } from 'firebase.js';
-import Button from 'components/ui/button/Button';
-import googleLogo from 'assets/google-logo.png';
 import FormTitle from 'components/title/FormTitle';
 import LoginAndLogoutButtonGroup from 'components/ui/buttonGroup/LoginAndLogoutButtonGroup';
 
