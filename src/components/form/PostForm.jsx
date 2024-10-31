@@ -20,10 +20,10 @@ import {
 } from 'firebase/firestore';
 import { db, auth } from 'firebase.js';
 import Input from 'components/ui/input/Input';
-import Button from 'components/ui/button/Button';
 import FileInput from 'components/ui/input/FileInput';
 import FormTitle from 'components/title/FormTitle';
 import TextArea from 'components/ui/textArea/TextArea';
+import SubmitAndCancelButtonGroup from 'components/ui/buttonGroup/SubmitAndCancelButtonGroup';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
@@ -57,11 +57,12 @@ const PostForm = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['posts']);
-      navigate('/');
-      // if (params) {
-      //   navigate(`/posts/${params.postId}`); // 왜 생성하면 여기로 가지 -> 뮤테이션 성공 값이 들어옴 ->
-      //   navigate(`/posts/${params.postId}`);
-      // }
+
+      if (params.postId) {
+        navigate(`/posts/${params.postId}`);
+      } else {
+        navigate('/');
+      }
     },
     onError: (error) => {
       alert('에러 발생 : ' + error);
@@ -139,10 +140,6 @@ const PostForm = () => {
     setFileName('');
   };
 
-  const handleCancel = () => {
-    navigate(-1);
-  };
-
   return (
     <Wrapper>
       <FormTitle>{postData ? '게시글 수정' : '새 게시글 작성'}</FormTitle>
@@ -174,12 +171,7 @@ const PostForm = () => {
           setAttachment={setAttachment}
         />
 
-        <ButtonWrapper>
-          <Button type="submit"> 작성</Button>
-          <Button type="button" $bgColor="white" onClick={handleCancel}>
-            취소
-          </Button>
-        </ButtonWrapper>
+        <SubmitAndCancelButtonGroup />
       </StyledPostForm>
     </Wrapper>
   );
@@ -201,30 +193,3 @@ const StyledPostForm = styled.form`
   flex-direction: column;
   width: 100%;
 `;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  margin-top: 40px;
-  justify-content: flex-end;
-  gap: 20px;
-`;
-
-// const TextArea = styled.textarea`
-//   padding: 10px;
-//   border: none;
-//   box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
-
-//   width: ${({ $width }) => ($width ? `${$width}` : '400px')};
-//   height: ${({ $height }) => ($height ? `${$height}` : '40px')};
-// `;
-
-// const TextLabel = styled.label`
-//   font-size: 18px;
-//   margin-top: 20px;
-// `;
-
-// const TextAreaWrapper = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   gap: 10px;
-// `;

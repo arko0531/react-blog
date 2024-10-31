@@ -14,6 +14,7 @@ import { db, auth } from 'firebase.js';
 import Button from 'components/ui/button/Button';
 import googleLogo from 'assets/google-logo.png';
 import FormTitle from 'components/title/FormTitle';
+import LoginAndLogoutButtonGroup from 'components/ui/buttonGroup/LoginAndLogoutButtonGroup';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
@@ -141,18 +142,10 @@ const AuthForm = () => {
             />
           </>
         )}
-        <ButtonWrapper>
-          <Button type="submit">
-            {isLogin === 'login' ? 'Login' : 'SignUp'}
-          </Button>
-
-          {isLogin === 'login' && (
-            <Button type="button" onClick={handleRegister} $bgColor="white">
-              register
-            </Button>
-          )}
-        </ButtonWrapper>
-        <Image src={googleLogo} onClick={handleGoogleLogin} />
+        <LoginAndLogoutButtonGroup
+          isLogin={isLogin}
+          onRegister={handleRegister}
+        />
       </StyledAuthForm>
     </>
   );
