@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
@@ -18,7 +18,8 @@ import {
 import { db } from 'firebase.js';
 import PostList from 'components/post/postList/PostList';
 import MainTitle from 'components/title/MainTitle';
-import CreatePostButton from 'components/ui/buttonGroup/CreatePostButton';
+import PostButtonWrapper from 'components/ui/PostButtonWrapper';
+import styled from 'styled-components';
 
 const Post = () => {
   const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
@@ -27,12 +28,13 @@ const Post = () => {
   const [snapshotLength, setSnapshotLength] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
 
-  const postsCount = 6;
-  const searchValue = useSelector((state) => state.posts.searchValue);
+  const isLogin = useSelector((state) => state.auth.isLogin);
   const posts = useSelector((state) => state.posts.posts);
+  const searchValue = useSelector((state) => state.posts.searchValue);
+
+  const postsCount = 6;
 
   const navigate = useNavigate();
-  const isLogin = useSelector((state) => state.auth.isLogin);
 
   const handleWritePost = () => {
     navigate('/posts/new');
@@ -50,7 +52,9 @@ const Post = () => {
       );
 
       const querySnapshot = await getDocs(postsQuery);
+
       const posts = {};
+
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
@@ -63,14 +67,6 @@ const Post = () => {
       return posts;
     }
   });
-
-  useEffect(() => {
-    if (data) {
-      const posts = Object.values(data);
-      dispatch(postsActions.handlePostsList(posts));
-      fetchPostsTotalCount();
-    }
-  }, [data]);
 
   // 페이지네이션
 
@@ -95,7 +91,9 @@ const Post = () => {
     );
 
     const querySnapshot = await getDocs(postsQuery);
+
     const posts = {};
+
     querySnapshot.forEach((doc) => {
       posts[doc.id] = { id: doc.id, ...doc.data() };
     });
@@ -106,6 +104,7 @@ const Post = () => {
 
     setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
     setFirstPostKey(querySnapshot.docs[0]);
+
     setSnapshotLength(querySnapshot.length);
 
     return posts;
@@ -113,17 +112,19 @@ const Post = () => {
 
   // prev
   const handlePrevPosts = async () => {
-    loadPosts(false);
+    loadPosts('prev');
     setPage(page - 1);
   };
 
   // next
   const handleNextPosts = () => {
-    loadPosts(true);
+    loadPosts('next');
     setPage(page + 1);
   };
 
-  const loadPosts = async (isNext) => {
+  const loadPosts = async (value) => {
+    const isNext = value === 'prev' ? false : true;
+
     const morePost = await loadMore(isNext);
 
     if (morePost) {
@@ -137,7 +138,7 @@ const Post = () => {
     fetchPostsTotalCount();
   }, [searchValue]);
 
-  const fetchPostsTotalCount = async () => {
+  const fetchPostsTotalCount = useCallback(async () => {
     const postsColl = query(
       // next
       collection(db, 'posts'),
@@ -146,9 +147,18 @@ const Post = () => {
       orderBy('timeStamp', 'desc')
     );
     const querySnapshot = await getCountFromServer(postsColl);
+
     const count = querySnapshot.data().count;
     setTotalCount(count);
-  };
+  }, [totalCount]);
+
+  useEffect(() => {
+    if (data) {
+      const posts = Object.values(data);
+      dispatch(postsActions.handlePostsList(posts));
+      fetchPostsTotalCount();
+    }
+  }, [data, dispatch]);
 
   if (isLoading) return <p>로딩 중...</p>;
 
@@ -158,8 +168,8 @@ const Post = () => {
   }
 
   return (
-    <>
-      {isLogin && <CreatePostButton onWritePost={handleWritePost} />}
+    <Container>
+      {isLogin && <PostButtonWrapper onWritePost={handleWritePost} />}
 
       <MainTitle>{searchValue === '' ? 'POSTS' : '검색 결과'}</MainTitle>
 
@@ -173,13 +183,26 @@ const Post = () => {
           posts={posts}
           onPrevClick={handlePrevPosts}
           onNextClick={handleNextPosts}
-          totalCount={totalCount}
           prevDisabled={page === 1}
           nextDisabled={totalCount <= page * posts?.length || posts?.length < 6}
         />
       )}
-    </>
+    </Container>
   );
 };
 
 export default Post;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  > h1 {
+    &:nth-of-type(1) {
+      align-items: center;
+      margin-bottom: 50px;
+      justify-content: center;
+      gap: 30px;
+    }
+  }
+`;

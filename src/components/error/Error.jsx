@@ -1,14 +1,22 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Error = ({ title, message, error }) => {
+  const navigate = useNavigate();
+
   return (
     <ErrorWrapper>
       <Title>{title}</Title>
 
       <Message>{message}</Message>
       <p>{error}</p>
-      <HomeLink to="/">메인으로 돌아가기</HomeLink>
+      <HomeLink
+        onClick={() => {
+          navigate('/');
+        }}
+      >
+        메인으로 돌아가기
+      </HomeLink>
     </ErrorWrapper>
   );
 };
@@ -31,7 +39,8 @@ const Message = styled.div`
   font-size: 24px;
 `;
 
-const HomeLink = styled(Link)`
+const HomeLink = styled.p`
   color: #0554f2;
   text-decoration: underline;
+  cursor: pointer;
 `;

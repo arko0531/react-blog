@@ -16,8 +16,10 @@ import SearchBar from 'components/search/SearchBar';
 const Search = ({ setLastPostKey }) => {
   const [search, setSearch] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+
   const searchValue = useSelector((state) => state.posts.searchValue);
   const postsCount = 6;
+
   const dispatch = useDispatch();
 
   // 검색 쿼리 실행
@@ -36,7 +38,9 @@ const Search = ({ setLastPostKey }) => {
       );
 
       const querySnapshot = await getDocs(searchQuery);
+
       const posts = {};
+
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
@@ -56,6 +60,10 @@ const Search = ({ setLastPostKey }) => {
     setIsSearching(true);
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
   useEffect(() => {
     if (isSearching && data) {
       setIsSearching(false);
@@ -65,10 +73,6 @@ const Search = ({ setLastPostKey }) => {
       dispatch(postsActions.handlePostsList(posts));
     }
   }, [data, dispatch, isSearching]);
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
 
   return (
     <SearchBar

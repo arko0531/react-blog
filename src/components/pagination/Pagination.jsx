@@ -5,29 +5,25 @@ const Pagination = ({
   onPrevClick,
   onNextClick,
   prevDisabled,
-  nextDisabled,
-  $prevDisabled,
-  $nextDisabled
+  nextDisabled
 }) => {
   return (
-    <>
-      <PaginationWrapper>
-        <Button
-          onClick={onPrevClick}
-          disabled={prevDisabled}
-          $disabled={$prevDisabled}
-        >
-          Prev
-        </Button>
-        <Button
-          onClick={onNextClick}
-          disabled={nextDisabled}
-          $disabled={$nextDisabled}
-        >
-          Next
-        </Button>
-      </PaginationWrapper>
-    </>
+    <PaginationWrapper>
+      <Button
+        onClick={onPrevClick}
+        disabled={prevDisabled}
+        $disabled={prevDisabled}
+      >
+        Prev
+      </Button>
+      <Button
+        onClick={onNextClick}
+        disabled={nextDisabled}
+        $disabled={nextDisabled}
+      >
+        Next
+      </Button>
+    </PaginationWrapper>
   );
 };
 
@@ -35,7 +31,4 @@ export default Pagination;
 
 const PaginationWrapper = styled.div`
   display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 20px;
 `;

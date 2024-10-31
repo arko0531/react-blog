@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from 'util/http';
 import {
   collection,
   deleteDoc,
@@ -11,14 +11,19 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { db } from 'firebase.js';
+import { auth, db } from 'firebase.js';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
-import EditAndDeleteButtonGroup from 'components/ui/buttonGroup/EditAndDeleteButtonGroup';
+import Button from 'components/ui/button/Button';
+import Modal from 'components/modal/Modal';
 import DetailPostBox from 'components/post/detailPost/DetailPostBox';
 
-const DetailPost = () => {
+const DetailPostPage = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   const params = useParams();
+  const isLogin = useSelector((state) => state.auth.isLogin);
+  const user = auth.currentUser; // 현재 로그인한 사용자
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts', params.postId],
@@ -29,7 +34,9 @@ const DetailPost = () => {
       );
 
       const querySnapshot = await getDocs(paramsQuery);
+
       const posts = {};
+
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
@@ -40,8 +47,8 @@ const DetailPost = () => {
   const { mutate } = useMutation({
     mutationKey: ['deletePost'],
     mutationFn: async ({ postDocRef, imageRef }) => {
-      const deletePost = await deleteDoc(postDocRef);
-      const deleteImage = await deleteObject(imageRef);
+      await deleteDoc(postDocRef);
+      await deleteObject(imageRef);
     },
     onSuccess: () => {
       navigate('/');
@@ -51,8 +58,11 @@ const DetailPost = () => {
     }
   });
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  // 수정
   const handleEdit = () => {
-    // 수정
     navigate(`/posts/${params.postId}/edit`);
   };
 
@@ -72,11 +82,19 @@ const DetailPost = () => {
 
   return (
     <PostContainer>
-      <EditAndDeleteButtonGroup
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        data={data}
-      />
+      <ButtonWrapper>
+        {isLogin && user?.email === data?.userEmail && (
+          <>
+            <Button $width="70" onClick={handleEdit}>
+              Edit
+            </Button>
+            <Button $width="70" $bgColor="white" onClick={openModal}>
+              Delete
+            </Button>
+          </>
+        )}
+      </ButtonWrapper>
+
       {error ? (
         <>
           <p>오류가 발생했습니다.</p>
@@ -85,17 +103,33 @@ const DetailPost = () => {
       ) : (
         <DetailPostBox data={data} />
       )}
+
+      {isModalOpen && (
+        <Modal
+          message="정말 삭제하시겠습니까?"
+          onConfirm={() => {
+            handleDelete();
+            closeModal();
+          }}
+          onCancel={closeModal}
+        />
+      )}
     </PostContainer>
   );
 };
 
-export default DetailPost;
+export default DetailPostPage;
 
 const PostContainer = styled.div`
   width: 85%;
   margin: 60px auto;
   padding: 30px 50px;
   background-color: #f9f9f9;
-  border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: end;
+  gap: 20px;
 `;
