@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -17,6 +17,7 @@ import {
 import { db } from 'firebase.js';
 import PostList from 'components/post/postList/PostList';
 import MainTitle from 'components/title/MainTitle';
+import CreatePostButton from 'components/ui/buttonGroup/CreatePostButton';
 
 const Post = () => {
   const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
@@ -27,6 +28,13 @@ const Post = () => {
   const postsCount = 6;
   const searchValue = useSelector((state) => state.posts.searchValue);
   const posts = useSelector((state) => state.posts.posts);
+
+  const navigate = useNavigate();
+  const isLogin = useSelector((state) => state.auth.isLogin);
+
+  const handleWritePost = () => {
+    navigate('/posts/new');
+  };
 
   const dispatch = useDispatch();
 
@@ -102,23 +110,22 @@ const Post = () => {
 
   // prev
   const handlePrevPosts = async () => {
-    const morePost = await loadMore(false);
-
-    if (morePost) {
-      const newPosts = Object.values(morePost);
-      dispatch(postsActions.handlePostsList(newPosts));
-      setPage(page - 1);
-    }
+    loadPosts(false);
+    setPage(page - 1);
   };
 
   // next
-  const handleNextPosts = async () => {
-    const morePost = await loadMore(true);
+  const handleNextPosts = () => {
+    loadPosts(true);
+    setPage(page + 1);
+  };
+
+  const loadPosts = async (isNext) => {
+    const morePost = await loadMore(isNext);
 
     if (morePost) {
       const newPosts = Object.values(morePost);
       dispatch(postsActions.handlePostsList(newPosts));
-      setPage(page + 1);
     }
   };
 
@@ -131,7 +138,10 @@ const Post = () => {
 
   return (
     <>
+      {isLogin && <CreatePostButton onWritePost={handleWritePost} />}
+
       <MainTitle>{searchValue === '' ? 'POSTS' : '검색 결과'}</MainTitle>
+
       {error ? (
         <>
           <p>오류가 발생했습니다.</p>
