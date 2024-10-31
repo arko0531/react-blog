@@ -44,7 +44,6 @@ const DetailPost = () => {
       const deleteImage = await deleteObject(imageRef);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['posts']);
       navigate('/');
     },
     onError: (error) => {
