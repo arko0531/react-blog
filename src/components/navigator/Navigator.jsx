@@ -9,10 +9,10 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { queryClient } from 'util/http';
 
 const Navigator = () => {
-  const navigate = useNavigate();
   const isLogin = useSelector((state) => state.auth.isLogin);
-
   const user = auth.currentUser;
+
+  const navigate = useNavigate();
 
   const { data } = useQuery({
     queryKey: ['user'],
@@ -23,7 +23,9 @@ const Navigator = () => {
       );
 
       const querySnapshot = await getDocs(userQuery);
+
       const userData = {};
+
       querySnapshot.forEach((doc) => {
         userData[doc.id] = { id: doc.id, ...doc.data() };
       });
@@ -44,7 +46,7 @@ const Navigator = () => {
 
   const handleLogout = async () => {
     try {
-      const signOutData = await signOut(auth);
+      await signOut(auth);
       userName = '';
       queryClient.clear();
       navigate('/');

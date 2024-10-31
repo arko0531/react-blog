@@ -11,6 +11,7 @@ import Search from 'components/search/Search';
 const SideBar = () => {
   const [firstPostKey, setFirstPostKey] = useState();
   const [lastPostKey, setLastPostKey] = useState();
+
   const dispatch = useDispatch();
 
   useEffect(() => {

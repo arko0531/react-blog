@@ -19,19 +19,20 @@ import {
   getDocs
 } from 'firebase/firestore';
 import { db, auth } from 'firebase.js';
-import Input from 'components/ui/input/Input';
+import FormLabelInput from 'components/ui/input/FormLabelInput';
 import FileInput from 'components/ui/input/FileInput';
 import FormTitle from 'components/title/FormTitle';
 import TextArea from 'components/ui/textArea/TextArea';
-import SubmitAndCancelButtonGroup from 'components/ui/buttonGroup/SubmitAndCancelButtonGroup';
+import Button from 'components/ui/button/Button';
 
 const PostForm = () => {
   const [attachment, setAttachment] = useState();
   const [postData, setPostData] = useState('');
-  const params = useParams();
-  const navigate = useNavigate();
-  const inputEl = useRef(null);
   const [fileName, setFileName] = useState('');
+
+  const navigate = useNavigate();
+  const params = useParams();
+  const inputEl = useRef(null);
 
   // 글 생성 / 수정
   const { mutate } = useMutation({
@@ -45,7 +46,7 @@ const PostForm = () => {
       imageName,
       timeStamp
     }) => {
-      const postingData = await setDoc(doc(db, 'posts', postId), {
+      await setDoc(doc(db, 'posts', postId), {
         title,
         content,
         userEmail,
@@ -79,7 +80,9 @@ const PostForm = () => {
       );
 
       const querySnapshot = await getDocs(editPostQuery);
+
       const posts = {};
+
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
@@ -139,11 +142,15 @@ const PostForm = () => {
     setFileName('');
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   return (
     <Wrapper>
       <FormTitle>{postData ? '게시글 수정' : '새 게시글 작성'}</FormTitle>
       <StyledPostForm onSubmit={handleWritePost}>
-        <Input
+        <FormLabelInput
           label="제목"
           type="text"
           id="title"
@@ -170,7 +177,12 @@ const PostForm = () => {
           setAttachment={setAttachment}
         />
 
-        <SubmitAndCancelButtonGroup />
+        <ButtonWrapper>
+          <Button type="submit"> 작성</Button>
+          <Button type="button" $bgColor="white" onClick={handleCancel}>
+            취소
+          </Button>
+        </ButtonWrapper>
       </StyledPostForm>
     </Wrapper>
   );
@@ -191,4 +203,11 @@ const StyledPostForm = styled.form`
   display: flex;
   flex-direction: column;
   width: 100%;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  margin-top: 40px;
+  justify-content: flex-end;
+  gap: 20px;
 `;

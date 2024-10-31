@@ -1,12 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getPostingDate } from 'util/dateFormat';
 
 const PostCard = ({ post }) => {
+  const navigate = useNavigate();
+
   return (
     <PostBox>
-      <Link to={`/posts/${post.postId}`}>
+      <div
+        onClick={() => {
+          navigate(`/posts/${post.postId}`);
+        }}
+      >
         <ImgBox src={post.imageURL} alt="post image" />
 
         <div>
@@ -15,7 +21,7 @@ const PostCard = ({ post }) => {
           <br />
           <p>{getPostingDate(post.timeStamp)} </p>
         </div>
-      </Link>
+      </div>
     </PostBox>
   );
 };
@@ -35,10 +41,13 @@ const PostBox = styled.div`
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 
+  cursor: pointer;
+
   h2 {
     font-size: 23px;
     font-weight: 500;
   }
+
   p {
     margin-top: 4px;
   }

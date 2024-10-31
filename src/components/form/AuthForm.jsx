@@ -1,4 +1,4 @@
-import Input from 'components/ui/input/Input';
+import Input from 'components/ui/input/FormLabelInput';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
@@ -11,9 +11,10 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db, auth } from 'firebase.js';
+import { isKoreanAndEnglishRegex } from 'constants/regex';
 import googleLogo from 'assets/google-logo.png';
 import FormTitle from 'components/title/FormTitle';
-import LoginAndLogoutButtonGroup from 'components/ui/buttonGroup/LoginAndLogoutButtonGroup';
+import Button from 'components/ui/button/Button';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
@@ -25,7 +26,7 @@ const AuthForm = () => {
   const { mutate } = useMutation({
     mutationKey: ['authData'],
     mutationFn: async ({ email, name, password }) => {
-      const userData = await setDoc(doc(db, 'users', email), {
+      await setDoc(doc(db, 'users', email), {
         email,
         name,
         password
@@ -39,7 +40,7 @@ const AuthForm = () => {
     }
   });
 
-  const handleAuth = async (e) => {
+  const handleAuthSubmit = async (e) => {
     e.preventDefault();
 
     const email = e.target.email.value;
@@ -48,11 +49,7 @@ const AuthForm = () => {
     // 로그인
     if (isLogin === 'login') {
       try {
-        const authData = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
+        await signInWithEmailAndPassword(auth, email, password);
         navigate('/');
       } catch (error) {
         alert('로그인 오류 : ' + error);
@@ -63,14 +60,16 @@ const AuthForm = () => {
     if (isLogin === 'register') {
       const passwordCheck = e.target.passwordCheck.value;
       const name = e.target.name.value;
+
       if (password !== passwordCheck) {
         alert('비밀번호가 일치하지 않습니다.');
         return;
-      } else if (password.length < 6 && passwordCheck.length < 6) {
+      }
+      if (password.length < 6 && passwordCheck.length < 6) {
         alert('비밀번호를 6자리 이상으로 설정해주세요.');
         return;
       }
-      if (!/^[ㄱ-ㅎ가-힣a-zA-Z]+$/.test(name)) {
+      if (!isKoreanAndEnglishRegex(name)) {
         alert('이름은 한글/영문만 입력할 수 있습니다.');
         return;
       }
@@ -92,7 +91,7 @@ const AuthForm = () => {
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const googleLoginData = await signInWithPopup(auth, provider);
+      await signInWithPopup(auth, provider);
 
       navigate('/');
     } catch (error) {
@@ -100,10 +99,14 @@ const AuthForm = () => {
     }
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   return (
-    <>
+    <AuthFormWrapper>
       <FormTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</FormTitle>
-      <StyledAuthForm id="authForm" onSubmit={handleAuth}>
+      <StyledAuthForm id="authForm" onSubmit={handleAuthSubmit}>
         <Input
           label="E-mail"
           type="email"
@@ -141,17 +144,36 @@ const AuthForm = () => {
             />
           </>
         )}
-        <LoginAndLogoutButtonGroup
-          isLogin={isLogin}
-          onRegister={handleRegister}
-        />
-        <Image src={googleLogo} onClick={handleGoogleLogin} />
+
+        <ButtonWrapper>
+          <Button type="submit">
+            {isLogin === 'login' ? 'Login' : 'SignUp'}
+          </Button>
+
+          {isLogin === 'login' ? (
+            <Button type="button" onClick={handleRegister} $bgColor="white">
+              register
+            </Button>
+          ) : (
+            <Button type="button" $bgColor="white" onClick={handleCancel}>
+              Cancel
+            </Button>
+          )}
+        </ButtonWrapper>
+
+        <GoogleImageLogin src={googleLogo} onClick={handleGoogleLogin} />
       </StyledAuthForm>
-    </>
+    </AuthFormWrapper>
   );
 };
 
 export default AuthForm;
+
+const AuthFormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
 
 const StyledAuthForm = styled.form`
   display: flex;
@@ -159,14 +181,14 @@ const StyledAuthForm = styled.form`
   align-items: center;
 `;
 
+const GoogleImageLogin = styled.img`
+  margin-top: 40px;
+  cursor: pointer;
+  width: 45px;
+`;
+
 const ButtonWrapper = styled.div`
   display: flex;
   margin-top: 40px;
   gap: 10px;
-`;
-
-const Image = styled.img`
-  margin-top: 40px;
-  cursor: pointer;
-  width: 45px;
 `;

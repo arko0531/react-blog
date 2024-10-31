@@ -10,7 +10,7 @@ const PostList = ({
   nextDisabled
 }) => {
   return (
-    <>
+    <Container>
       <PostListWrapper>
         {posts.map((post) => (
           <PostCard key={post.postId} post={post} />
@@ -21,15 +21,27 @@ const PostList = ({
         onPrevClick={onPrevClick}
         onNextClick={onNextClick}
         prevDisabled={prevDisabled}
-        $prevDisabled={prevDisabled}
         nextDisabled={nextDisabled}
-        $nextDisabled={nextDisabled}
       />
-    </>
+    </Container>
   );
 };
 
 export default PostList;
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  > div {
+    &:nth-of-type(2) {
+      margin-top: 20px;
+      justify-content: center;
+      gap: 30px;
+    }
+  }
+`;
 
 const PostListWrapper = styled.div`
   display: flex;

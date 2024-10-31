@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import Button from 'components/ui/button/Button';
 
-const CreatePostButton = ({ onWritePost }) => {
+const PostButtonWrapper = ({ onWritePost }) => {
   return (
     <ButtonWrapper>
       <Button onClick={onWritePost}>New</Button>
@@ -9,7 +9,7 @@ const CreatePostButton = ({ onWritePost }) => {
   );
 };
 
-export default CreatePostButton;
+export default PostButtonWrapper;
 
 const ButtonWrapper = styled.div`
   display: flex;
