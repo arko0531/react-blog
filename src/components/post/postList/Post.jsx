@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   collection,
   endBefore,
+  getCountFromServer,
   getDocs,
   limit,
   limitToLast,
@@ -24,6 +25,7 @@ const Post = () => {
     useOutletContext();
   const [page, setPage] = useState(1);
   const [snapshotLength, setSnapshotLength] = useState(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   const postsCount = 6;
   const searchValue = useSelector((state) => state.posts.searchValue);
@@ -66,6 +68,7 @@ const Post = () => {
     if (data) {
       const posts = Object.values(data);
       dispatch(postsActions.handlePostsList(posts));
+      fetchPostsTotalCount();
     }
   }, [data]);
 
@@ -129,6 +132,24 @@ const Post = () => {
     }
   };
 
+  // 총 게시글 개수만 구함 (next 비활성화 판단)
+  useEffect(() => {
+    fetchPostsTotalCount();
+  }, [searchValue]);
+
+  const fetchPostsTotalCount = async () => {
+    const postsColl = query(
+      // next
+      collection(db, 'posts'),
+      where('title', '>=', searchValue),
+      where('title', '<=', searchValue + '\uf8ff'),
+      orderBy('timeStamp', 'desc')
+    );
+    const querySnapshot = await getCountFromServer(postsColl);
+    const count = querySnapshot.data().count;
+    setTotalCount(count);
+  };
+
   if (isLoading) return <p>로딩 중...</p>;
 
   if (posts.length === 0) {
@@ -152,7 +173,9 @@ const Post = () => {
           posts={posts}
           onPrevClick={handlePrevPosts}
           onNextClick={handleNextPosts}
-          page={page}
+          totalCount={totalCount}
+          prevDisabled={page === 1}
+          nextDisabled={totalCount <= page * posts?.length || posts?.length < 6}
         />
       )}
     </>
