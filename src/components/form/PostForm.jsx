@@ -56,11 +56,10 @@ const PostForm = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['posts']);
-
       if (params.postId) {
         navigate(`/posts/${params.postId}`);
       } else {
+        queryClient.invalidateQueries(['posts']);
         navigate('/');
       }
     },
