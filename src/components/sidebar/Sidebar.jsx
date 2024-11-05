@@ -4,7 +4,7 @@ import { authActions } from 'store/reducers/auth';
 import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from 'firebase.js';
+import { auth } from 'firebase.ts';
 import Navigator from 'components/navigator/Navigator';
 import Search from 'components/search/Search';
 

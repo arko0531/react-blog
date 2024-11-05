@@ -11,7 +11,7 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { auth, db } from 'firebase.js';
+import { auth, db } from 'firebase.ts';
 import { deleteObject, getStorage, ref } from 'firebase/storage';
 import Button from 'components/ui/button/Button';
 import Modal from 'components/modal/Modal';
@@ -77,8 +77,7 @@ const DetailPostPage = () => {
     }
   };
 
-  if (isLoading) return;
-  <p>로딩 중...</p>;
+  if (isLoading) return <p>로딩 중...</p>;
 
   return (
     <PostContainer>

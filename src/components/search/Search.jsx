@@ -10,7 +10,7 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { db } from 'firebase.js';
+import { db } from 'firebase.ts';
 import SearchBar from 'components/search/SearchBar';
 
 const Search = ({ setLastPostKey }) => {

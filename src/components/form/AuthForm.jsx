@@ -10,7 +10,7 @@ import {
   signInWithPopup
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { db, auth } from 'firebase.js';
+import { db, auth } from 'firebase.ts';
 import { isKoreanAndEnglishRegex } from 'constants/regex';
 import googleLogo from 'assets/google-logo.png';
 import FormTitle from 'components/title/FormTitle';

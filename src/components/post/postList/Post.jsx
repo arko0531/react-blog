@@ -15,7 +15,7 @@ import {
   startAfter,
   where
 } from 'firebase/firestore';
-import { db } from 'firebase.js';
+import { db } from 'firebase.ts';
 import PostList from 'components/post/postList/PostList';
 import MainTitle from 'components/title/MainTitle';
 import PostButtonWrapper from 'components/ui/PostButtonWrapper';

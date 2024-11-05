@@ -18,7 +18,7 @@ import {
   setDoc,
   getDocs
 } from 'firebase/firestore';
-import { db, auth } from 'firebase.js';
+import { db, auth } from 'firebase.ts';
 import FormLabelInput from 'components/ui/input/FormLabelInput';
 import FileInput from 'components/ui/input/FileInput';
 import FormTitle from 'components/title/FormTitle';
