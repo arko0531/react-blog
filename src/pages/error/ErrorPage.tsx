@@ -1,6 +1,6 @@
 import Error from 'components/error/Error';
 import { useRouteError } from 'react-router-dom';
-import { ErrorInfo } from 'types/error';
+import { ErrorInfo } from 'types/error-interface';
 
 const ErrorPage = () => {
   const error = useRouteError() as ErrorInfo;

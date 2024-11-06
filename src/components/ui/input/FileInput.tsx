@@ -1,24 +1,31 @@
 import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
+import { FileInputProps } from 'types/ui-interface';
 
-const FileInput = ({ inputEl, fileName, setFileName, setAttachment }) => {
-  const handleFileInput = useCallback((e) => {
-    const files = e.target.files;
-    const theFile = files[0]; // file url
+const FileInput = ({
+  inputEl,
+  fileName,
+  setFileName,
+  setAttachment
+}: FileInputProps) => {
+  const handleFileInput = useCallback((e: Event) => {
+    const { files } = e.target as HTMLInputElement;
+    const theFile = files?.[0];
 
-    // file name
     if (files && files[0]) {
-      setFileName(e.target.files[0].name);
+      setFileName(files[0].name);
     }
 
     const reader = new FileReader();
 
-    reader.onloadend = (finishedEvent) => {
-      const result = finishedEvent.currentTarget.result;
+    reader.onloadend = (finishedEvent: ProgressEvent<FileReader>) => {
+      const result = finishedEvent.target?.result as string;
       setAttachment(result);
     };
 
-    reader.readAsDataURL(theFile);
+    if (theFile) {
+      reader.readAsDataURL(theFile);
+    }
   }, []);
 
   useEffect(() => {

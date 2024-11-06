@@ -1,9 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
+import { ButtonProps } from 'types/ui-interface';
 
-const Button = ({ type, onClick, children, ...props }) => {
+const Button = ({
+  children,
+  $color,
+  $width,
+  $bgColor,
+  $disabled,
+  ...props
+}: ButtonProps) => {
   return (
-    <StyledButton type={type} onClick={onClick} {...props}>
+    <StyledButton
+      $color={$color}
+      $width={$width}
+      $bgColor={$bgColor}
+      $disabled={$disabled}
+      {...props}
+    >
       {children}
     </StyledButton>
   );
@@ -11,7 +25,7 @@ const Button = ({ type, onClick, children, ...props }) => {
 
 export default Button;
 
-const StyledButton = styled.button`
+const StyledButton = styled.button<ButtonProps>`
   background-color: ${({ $bgColor, $disabled }) =>
     $bgColor ? $bgColor : $disabled ? '#d9d9d9f8' : '#ffdd1ef9'};
   width: ${({ $width }) => ($width ? `${$width}px` : '100px')};

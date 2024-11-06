@@ -1,23 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { authActions } from 'store/reducers/auth';
-import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from 'firebase.ts';
 import Navigator from 'components/navigator/Navigator';
 import Search from 'components/search/Search';
+import { useAppDispatch } from 'hooks/redux-hooks';
+import { QuerySnapshot } from 'firebase/firestore';
 
 const SideBar = () => {
-  const [firstPostKey, setFirstPostKey] = useState();
-  const [lastPostKey, setLastPostKey] = useState();
+  const [firstPostKey, setFirstPostKey] = useState<QuerySnapshot | null>(null);
+  const [lastPostKey, setLastPostKey] = useState<QuerySnapshot | null>(null);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const isLogin = onAuthStateChanged(auth, (user) => {
+    const isLogin = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        dispatch(authActions.login(user.accessToken));
+        const token = await user.getIdToken();
+        dispatch(authActions.login(token));
       } else {
         dispatch(authActions.logout());
       }
@@ -61,7 +63,6 @@ const Side = styled.div`
   align-items: start;
   padding-top: 100px;
   width: 400px;
-
   height: 100vh;
   background-color: #0554f2;
   box-shadow:

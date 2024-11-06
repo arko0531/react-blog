@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import Button from 'components/ui/button/Button';
+import { SearchInfo } from 'types/post-interface';
 
-const SearchForm = ({ onSearchPost, onSearchChange, search }) => {
+const SearchForm = ({ onSearchPost, onSearchChange, search }: SearchInfo) => {
   return (
     <SearchFormWrapper onSubmit={onSearchPost}>
       <SearchInput
@@ -11,7 +12,7 @@ const SearchForm = ({ onSearchPost, onSearchChange, search }) => {
         onChange={onSearchChange}
         value={search}
       />
-      <Button type="submit" $width="60">
+      <Button type="submit" $width={60}>
         검색
       </Button>
     </SearchFormWrapper>

@@ -24,15 +24,20 @@ import FileInput from 'components/ui/input/FileInput';
 import FormTitle from 'components/title/FormTitle';
 import TextArea from 'components/ui/textArea/TextArea';
 import Button from 'components/ui/button/Button';
+import { PostInfo } from 'types/post-interface';
 
 const PostForm = () => {
-  const [attachment, setAttachment] = useState();
-  const [postData, setPostData] = useState('');
-  const [fileName, setFileName] = useState('');
+  const [attachment, setAttachment] = useState<string>('');
+  const [postData, setPostData] = useState<PostInfo>();
+  const [fileName, setFileName] = useState<string>('');
+  const [post, setPost] = useState({
+    title: '',
+    content: ''
+  });
 
   const navigate = useNavigate();
   const params = useParams();
-  const inputEl = useRef(null);
+  const inputEl = useRef<HTMLInputElement>(null);
 
   // 글 생성 / 수정
   const { mutate } = useMutation({
@@ -45,7 +50,7 @@ const PostForm = () => {
       imageURL,
       imageName,
       timeStamp
-    }) => {
+    }: PostInfo) => {
       await setDoc(doc(db, 'posts', postId), {
         title,
         content,
@@ -60,7 +65,7 @@ const PostForm = () => {
       if (params.postId) {
         navigate(`/posts/${params.postId}`);
       } else {
-        queryClient.invalidateQueries(['posts']);
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
         navigate('/');
       }
     },
@@ -81,7 +86,7 @@ const PostForm = () => {
 
       const querySnapshot = await getDocs(editPostQuery);
 
-      const posts = {};
+      const posts: { [id: string]: any } = {};
 
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
@@ -95,18 +100,21 @@ const PostForm = () => {
     if (data) {
       setPostData(data);
       setFileName(data?.imageName || '');
+      setPost({
+        title: data?.title || '',
+        content: data?.content || ''
+      });
     }
   }, [data]);
 
-  const handleWritePost = async (e) => {
+  const handleWritePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const user = auth.currentUser;
+    const user = auth.currentUser!;
 
     if (!fileName) {
       alert('사진을 추가해주세요.');
       return;
     }
-
     let imageURL;
 
     // 파일
@@ -120,13 +128,13 @@ const PostForm = () => {
       imageURL = data?.imageURL; // 기존 사진 그대로 사용
     }
 
-    const imageName = fileName; // 이름
+    const imageName: string = fileName; // 이름
 
-    const title = e.target.title.value;
-    const content = e.target.content.value;
-    const userEmail = user.email;
-    const postId = params.postId ? params.postId : uuidv4();
-    const timeStamp = Number(new Date());
+    const title: string = post.title!;
+    const content: string = post.content!;
+    const userEmail: string | null = user.email;
+    const postId: string = params.postId ? params.postId : uuidv4();
+    const timeStamp: number = Number(new Date());
 
     mutate({
       title,
@@ -146,6 +154,10 @@ const PostForm = () => {
     navigate(-1);
   };
 
+  const handlePostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPost({ ...post, [e.target.name]: e.target.value });
+  };
+
   return (
     <Wrapper>
       <FormTitle>{postData ? '게시글 수정' : '새 게시글 작성'}</FormTitle>
@@ -155,8 +167,10 @@ const PostForm = () => {
           type="text"
           id="title"
           $width="100%"
-          defaultValue={postData?.title || ''}
+          // defaultValue={postData?.title || ''}
+          value={post.title}
           placeholder="제목을 입력해주세요."
+          onChange={handlePostChange}
           required
         />
 
@@ -166,7 +180,9 @@ const PostForm = () => {
           $width="100%"
           $height="400px"
           placeholder="내용을 입력해주세요."
-          defaultValue={postData?.content || ''}
+          // defaultValue={postData?.content || ''}
+          value={post.content}
+          onChange={handlePostChange}
           required
         />
 

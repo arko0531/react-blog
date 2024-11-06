@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import Button from 'components/ui/button/Button';
+import { PostButtonWrapperProps } from 'types/ui-interface';
 
-const PostButtonWrapper = ({ onWritePost }) => {
+const PostButtonWrapper = ({ onWritePost }: PostButtonWrapperProps) => {
   return (
     <ButtonWrapper>
       <Button onClick={onWritePost}>New</Button>

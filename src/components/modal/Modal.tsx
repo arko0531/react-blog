@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from 'components/ui/button/Button';
+import { ModalInfo } from 'types/modal-interface';
 
-const Modal = ({ message, onConfirm, onCancel }) => {
+const Modal = ({ message, onConfirm, onCancel }: ModalInfo) => {
   return (
     <ModalWrapper>
       <ModalContainer>
