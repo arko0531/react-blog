@@ -1,4 +1,4 @@
-import { QuerySnapshot } from 'firebase/firestore';
+import { QueryDocumentSnapshot } from 'firebase/firestore';
 
 export interface PostInfo {
   title: string;
@@ -10,6 +10,14 @@ export interface PostInfo {
   timeStamp: number;
 }
 
+export interface PostProps {
+  posts: PostInfo[];
+  onPrevClick: () => void;
+  onNextClick: () => void;
+  prevDisabled: boolean;
+  nextDisabled: boolean;
+}
+
 export interface SearchInfo {
   onSearchPost: (e: React.FormEvent<HTMLFormElement>) => void;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -17,10 +25,14 @@ export interface SearchInfo {
 }
 
 export interface SearchProps {
-  firstPostKey?: QuerySnapshot | null;
-  setFirstPostKey?: React.Dispatch<React.SetStateAction<any | null>>;
-  lastPostKey?: QuerySnapshot | null;
-  setLastPostKey?: React.Dispatch<React.SetStateAction<any | null>>;
+  firstPostKey?: QueryDocumentSnapshot | null;
+  setFirstPostKey?: React.Dispatch<
+    React.SetStateAction<QueryDocumentSnapshot | null>
+  >;
+  lastPostKey?: QueryDocumentSnapshot | null;
+  setLastPostKey?: React.Dispatch<
+    React.SetStateAction<QueryDocumentSnapshot | null>
+  >;
 }
 
 export interface SearchValueInfo {

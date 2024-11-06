@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import { SearchProps } from 'types/post-interface';
+import { useAppDispatch, useAppSelector } from 'hooks/redux-hooks';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -22,15 +23,19 @@ import PostButtonWrapper from 'components/ui/PostButtonWrapper';
 import styled from 'styled-components';
 
 const Post = () => {
-  const { firstPostKey, setFirstPostKey, lastPostKey, setLastPostKey } =
-    useOutletContext();
-  const [page, setPage] = useState(1);
-  const [snapshotLength, setSnapshotLength] = useState(null);
-  const [totalCount, setTotalCount] = useState(0);
+  const {
+    firstPostKey,
+    setFirstPostKey,
+    lastPostKey,
+    setLastPostKey
+  }: SearchProps = useOutletContext();
+  const [page, setPage] = useState<number>(1);
+  const [snapshotLength, setSnapshotLength] = useState<number>(0);
+  const [totalCount, setTotalCount] = useState<number>(0);
 
-  const isLogin = useSelector((state) => state.auth.isLogin);
-  const posts = useSelector((state) => state.posts.posts);
-  const searchValue = useSelector((state) => state.posts.searchValue);
+  const isLogin = useAppSelector((state) => state.auth.isLogin);
+  const posts = useAppSelector((state) => state.posts.posts);
+  const searchValue = useAppSelector((state) => state.posts.searchValue);
 
   const postsCount = 6;
 
@@ -40,7 +45,7 @@ const Post = () => {
     navigate('/posts/new');
   };
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['posts'],
@@ -53,16 +58,18 @@ const Post = () => {
 
       const querySnapshot = await getDocs(postsQuery);
 
-      const posts = {};
+      const posts: { [id: string]: any } = {};
 
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
 
-      setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setFirstPostKey(querySnapshot.docs[0]);
+      if (querySnapshot && setLastPostKey && setFirstPostKey) {
+        setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setFirstPostKey(querySnapshot.docs[0]);
+      }
 
-      setSnapshotLength(querySnapshot.length);
+      setSnapshotLength(querySnapshot.docs.length);
 
       return posts;
     }
@@ -71,7 +78,7 @@ const Post = () => {
   // 페이지네이션
 
   // prev, next 각각
-  const loadMore = async (isNext) => {
+  const loadMore = async (isNext: boolean) => {
     if (!lastPostKey || !firstPostKey) {
       return;
     }
@@ -92,7 +99,7 @@ const Post = () => {
 
     const querySnapshot = await getDocs(postsQuery);
 
-    const posts = {};
+    const posts: { [id: string]: any } = {};
 
     querySnapshot.forEach((doc) => {
       posts[doc.id] = { id: doc.id, ...doc.data() };
@@ -102,10 +109,12 @@ const Post = () => {
       return;
     }
 
-    setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-    setFirstPostKey(querySnapshot.docs[0]);
+    if (querySnapshot && setLastPostKey && setFirstPostKey) {
+      setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setFirstPostKey(querySnapshot.docs[0]);
+    }
 
-    setSnapshotLength(querySnapshot.length);
+    setSnapshotLength(querySnapshot.docs.length);
 
     return posts;
   };
@@ -122,7 +131,7 @@ const Post = () => {
     setPage(page + 1);
   };
 
-  const loadPosts = async (value) => {
+  const loadPosts = async (value: string) => {
     const isNext = value === 'prev' ? false : true;
 
     const morePost = await loadMore(isNext);

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from 'hooks/redux-hooks';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { auth, db } from 'firebase.ts';
@@ -9,8 +9,8 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { queryClient } from 'util/http';
 
 const Navigator = () => {
-  const isLogin = useSelector((state) => state.auth.isLogin);
-  const user = auth.currentUser;
+  const isLogin = useAppSelector((state) => state.auth.isLogin);
+  const user = auth.currentUser!;
 
   const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const Navigator = () => {
 
       const querySnapshot = await getDocs(userQuery);
 
-      const userData = {};
+      const userData: { [id: string]: any } = {};
 
       querySnapshot.forEach((doc) => {
         userData[doc.id] = { id: doc.id, ...doc.data() };

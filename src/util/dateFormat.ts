@@ -1,4 +1,4 @@
-export const getPostingDate = (timeStamp) => {
+export const getPostingDate = (timeStamp: number) => {
   // 날짜 설정
   const today = new Date(timeStamp);
   const year = today.getFullYear();

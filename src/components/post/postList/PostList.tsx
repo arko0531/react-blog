@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import PostCard from 'components/post/card/PostCard';
 import Pagination from 'components/pagination/Pagination';
+import { PostProps } from 'types/post-interface';
 
 const PostList = ({
   posts,
@@ -8,7 +9,7 @@ const PostList = ({
   onNextClick,
   prevDisabled,
   nextDisabled
-}) => {
+}: PostProps) => {
   return (
     <Container>
       <PostListWrapper>
