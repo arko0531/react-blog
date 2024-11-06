@@ -7,11 +7,14 @@ import { auth } from 'firebase.ts';
 import Navigator from 'components/navigator/Navigator';
 import Search from 'components/search/Search';
 import { useAppDispatch } from 'hooks/redux-hooks';
-import { QuerySnapshot } from 'firebase/firestore';
+import { QueryDocumentSnapshot } from 'firebase/firestore';
 
 const SideBar = () => {
-  const [firstPostKey, setFirstPostKey] = useState<QuerySnapshot | null>(null);
-  const [lastPostKey, setLastPostKey] = useState<QuerySnapshot | null>(null);
+  const [firstPostKey, setFirstPostKey] =
+    useState<QueryDocumentSnapshot | null>(null);
+  const [lastPostKey, setLastPostKey] = useState<QueryDocumentSnapshot | null>(
+    null
+  );
 
   const dispatch = useAppDispatch();
 
