@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { ErrorProps } from 'types/error';
+import { ErrorProps } from 'types/error-interface';
 
 const Error = ({ title, message, error }: ErrorProps) => {
   const navigate = useNavigate();

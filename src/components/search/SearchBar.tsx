@@ -1,7 +1,8 @@
 import SearchForm from 'components/form/SearchForm';
 import styled from 'styled-components';
+import { SearchInfo } from 'types/post-interface';
 
-const SearchBar = ({ onSearchPost, onSearchChange, search }) => {
+const SearchBar = ({ onSearchPost, onSearchChange, search }: SearchInfo) => {
   return (
     <SearchWrapper>
       <SearchForm

@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import { TitleProps } from 'types/title-interface';
 
-const FormTitle = ({ children }) => {
+const FormTitle = ({ children }: TitleProps) => {
   return <Title>{children}</Title>;
 };
 

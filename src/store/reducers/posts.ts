@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { PostsReducerInfo } from 'types/post-interface';
 
-const initialState = { posts: [], searchValue: '' };
+const initialState: PostsReducerInfo = { posts: [], searchValue: '' };
 
 const postsSlice = createSlice({
   name: 'posts',

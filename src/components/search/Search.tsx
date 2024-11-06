@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { postsActions } from 'store/reducers/posts';
 import { useQuery } from '@tanstack/react-query';
+import { useAppSelector } from 'hooks/redux-hooks';
 import {
   collection,
   getDocs,
@@ -12,12 +13,13 @@ import {
 } from 'firebase/firestore';
 import { db } from 'firebase.ts';
 import SearchBar from 'components/search/SearchBar';
+import { SearchProps } from 'types/post-interface';
 
-const Search = ({ setLastPostKey }) => {
-  const [search, setSearch] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+const Search = ({ setLastPostKey }: SearchProps) => {
+  const [search, setSearch] = useState<string>('');
+  const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  const searchValue = useSelector((state) => state.posts.searchValue);
+  const searchValue = useAppSelector((state) => state.posts.searchValue);
   const postsCount = 6;
 
   const dispatch = useDispatch();
@@ -39,7 +41,7 @@ const Search = ({ setLastPostKey }) => {
 
       const querySnapshot = await getDocs(searchQuery);
 
-      const posts = {};
+      const posts: { [id: string]: any } = {};
 
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
@@ -52,7 +54,7 @@ const Search = ({ setLastPostKey }) => {
     }
   });
 
-  const handelSearchPost = (e) => {
+  const handelSearchPost = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch(postsActions.setSearchValue(search));
 
@@ -60,14 +62,14 @@ const Search = ({ setLastPostKey }) => {
     setIsSearching(true);
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
 
   useEffect(() => {
     if (isSearching && data) {
       setIsSearching(false);
-      setLastPostKey(data.searchDoc);
+      setLastPostKey?.(data.searchDoc);
 
       const posts = Object.values(data.posts);
       dispatch(postsActions.handlePostsList(posts));

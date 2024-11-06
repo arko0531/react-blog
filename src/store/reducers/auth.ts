@@ -1,12 +1,13 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AuthReducerInfo } from 'types/auth-interface';
 
-const initialState = { isLogin: false, token: null };
+const initialState: AuthReducerInfo = { isLogin: false };
 
 const authSlice = createSlice({
   name: 'isLogin',
   initialState,
   reducers: {
-    login(state, actions) {
+    login(state, actions: PayloadAction<string>) {
       state.isLogin = true;
       localStorage.setItem('token', actions.payload);
     },

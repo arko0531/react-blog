@@ -1,4 +1,4 @@
-import Input from 'components/ui/input/FormLabelInput';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useSearchParams } from 'react-router-dom';
@@ -15,17 +15,24 @@ import { isKoreanAndEnglishRegex } from 'constants/regex';
 import googleLogo from 'assets/google-logo.png';
 import FormTitle from 'components/title/FormTitle';
 import Button from 'components/ui/button/Button';
+import Input from 'components/ui/input/FormLabelInput';
+import { AuthInfo } from 'types/auth-interface';
 
 const AuthForm = () => {
   const [searchParams] = useSearchParams();
+  const [user, setUser] = useState<AuthInfo>({
+    email: '',
+    name: '',
+    password: '',
+    passwordCheck: ''
+  });
 
   const isLogin = searchParams.get('mode');
-
   const navigate = useNavigate();
 
   const { mutate } = useMutation({
     mutationKey: ['authData'],
-    mutationFn: async ({ email, name, password }) => {
+    mutationFn: async ({ email, name, password }: AuthInfo) => {
       await setDoc(doc(db, 'users', email), {
         email,
         name,
@@ -40,11 +47,11 @@ const AuthForm = () => {
     }
   });
 
-  const handleAuthSubmit = async (e) => {
+  const handleAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const email: string = user.email!;
+    const password: string = user.password!;
 
     // 로그인
     if (isLogin === 'login') {
@@ -58,8 +65,8 @@ const AuthForm = () => {
 
     // 회원가입
     if (isLogin === 'register') {
-      const passwordCheck = e.target.passwordCheck.value;
-      const name = e.target.name.value;
+      const passwordCheck: string = user.passwordCheck!;
+      const name: string = user.name!;
 
       if (password !== passwordCheck) {
         alert('비밀번호가 일치하지 않습니다.');
@@ -103,6 +110,10 @@ const AuthForm = () => {
     navigate(-1);
   };
 
+  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
   return (
     <AuthFormWrapper>
       <FormTitle>{isLogin === 'login' ? 'Login' : 'SignUp'}</FormTitle>
@@ -114,6 +125,7 @@ const AuthForm = () => {
           $width="400px"
           placeholder="이메일을 입력해주세요."
           maxLength="320"
+          onChange={handleUserChange}
           required
         />
         <Input
@@ -122,6 +134,7 @@ const AuthForm = () => {
           type="password"
           $width="400px"
           placeholder="비밀번호를 입력해 주세요."
+          onChange={handleUserChange}
           required
         />
         {isLogin !== 'login' && (
@@ -132,6 +145,7 @@ const AuthForm = () => {
               type="password"
               $width="400px"
               placeholder="비밀번호를 다시 입력해 주세요."
+              onChange={handleUserChange}
               required
             />
             <Input
@@ -140,6 +154,7 @@ const AuthForm = () => {
               id="name"
               $width="400px"
               placeholder="이름을 입력해 주세요."
+              onChange={handleUserChange}
               required
             />
           </>
