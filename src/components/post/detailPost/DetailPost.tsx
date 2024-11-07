@@ -1,28 +1,35 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from 'hooks/redux-hooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   collection,
   deleteDoc,
   doc,
+  DocumentReference,
   getDocs,
   query,
   where
 } from 'firebase/firestore';
 import { auth, db } from 'firebase.ts';
-import { deleteObject, getStorage, ref } from 'firebase/storage';
+import {
+  deleteObject,
+  getStorage,
+  ref,
+  StorageReference
+} from 'firebase/storage';
 import Button from 'components/ui/button/Button';
 import Modal from 'components/modal/Modal';
 import DetailPostBox from 'components/post/detailPost/DetailPostBox';
+import { DetailPostInfo } from 'types/post-interface';
 
 const DetailPostPage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const isLogin = useAppSelector((state) => state.auth.isLogin);
 
   const navigate = useNavigate();
   const params = useParams();
-  const isLogin = useSelector((state) => state.auth.isLogin);
   const user = auth.currentUser; // 현재 로그인한 사용자
 
   const { data, isLoading, error } = useQuery({
@@ -35,7 +42,7 @@ const DetailPostPage = () => {
 
       const querySnapshot = await getDocs(paramsQuery);
 
-      const posts = {};
+      const posts: { [id: string]: any } = {};
 
       querySnapshot.forEach((doc) => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
@@ -46,8 +53,8 @@ const DetailPostPage = () => {
 
   const { mutate } = useMutation({
     mutationKey: ['deletePost'],
-    mutationFn: async ({ postDocRef, imageRef }) => {
-      await deleteDoc(postDocRef);
+    mutationFn: async ({ postDoc, imageRef }: DetailPostInfo) => {
+      await deleteDoc(postDoc);
       await deleteObject(imageRef);
     },
     onSuccess: () => {
@@ -67,13 +74,13 @@ const DetailPostPage = () => {
   };
 
   const handleDelete = async () => {
-    const postDocRef = doc(db, 'posts', data.id);
+    const postDoc: DocumentReference = doc(db, 'posts', data.id);
 
     try {
-      const imageRef = ref(getStorage(), data.imageURL);
-      mutate({ postDocRef, imageRef });
+      const imageRef: StorageReference = ref(getStorage(), data.imageURL);
+      mutate({ postDoc, imageRef });
     } catch (error) {
-      alert('삭제 오류 : ', error);
+      alert('삭제 오류 : ' + error);
     }
   };
 
@@ -84,10 +91,10 @@ const DetailPostPage = () => {
       <ButtonWrapper>
         {isLogin && user?.email === data?.userEmail && (
           <>
-            <Button $width="70" onClick={handleEdit}>
+            <Button $width={70} onClick={handleEdit}>
               Edit
             </Button>
-            <Button $width="70" $bgColor="white" onClick={openModal}>
+            <Button $width={70} $bgColor="white" onClick={openModal}>
               Delete
             </Button>
           </>

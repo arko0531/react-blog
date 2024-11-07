@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { getPostingDate } from 'util/dateFormat';
+import { PostInfo } from 'types/post-interface';
 
-const PostCard = ({ post }) => {
+const PostCard = ({ post }: { key: string; post: PostInfo }) => {
   const navigate = useNavigate();
 
   return (
@@ -13,7 +14,7 @@ const PostCard = ({ post }) => {
           navigate(`/posts/${post.postId}`);
         }}
       >
-        <ImgBox src={post.imageURL} alt="post image" />
+        <ImgBox src={post.imageURL} alt={post.imageName} />
 
         <div>
           <br />

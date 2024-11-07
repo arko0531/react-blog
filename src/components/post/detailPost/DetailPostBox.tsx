@@ -1,14 +1,15 @@
 import styled from 'styled-components';
+import { PostInfo } from 'types/post-interface';
 import { getPostingDate } from 'util/dateFormat';
 
-const DetailPostBox = ({ data }) => {
+const DetailPostBox = ({ data }: { data: PostInfo }) => {
   return (
     <Content>
       <h1>{data.title}</h1>
       <PostingDate>작성자 : {data.userEmail}</PostingDate>
       <PostingDate>작성일 : {getPostingDate(data.timeStamp)}</PostingDate>
       <div>
-        <ImgBox src={data.imageURL} alt="post image" />
+        <ImgBox src={data.imageURL} alt={data.imageName} />
         <br />
         <ContentText>{data.content}</ContentText>
       </div>
