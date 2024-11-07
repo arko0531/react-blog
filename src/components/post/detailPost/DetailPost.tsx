@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useAppSelector } from 'hooks/redux-hooks';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -24,7 +24,7 @@ import Modal from 'components/modal/Modal';
 import DetailPostBox from 'components/post/detailPost/DetailPostBox';
 import { DetailPostInfo } from 'types/post-interface';
 
-const DetailPostPage = () => {
+const DetailPost = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const isLogin = useAppSelector((state) => state.auth.isLogin);
 
@@ -124,7 +124,7 @@ const DetailPostPage = () => {
   );
 };
 
-export default DetailPostPage;
+export default DetailPost;
 
 const PostContainer = styled.div`
   width: 85%;

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { SearchProps } from 'types/post-interface';
 import { useAppDispatch, useAppSelector } from 'hooks/redux-hooks';
@@ -30,7 +30,6 @@ const Post = () => {
     setLastPostKey
   }: SearchProps = useOutletContext();
   const [page, setPage] = useState<number>(1);
-  const [snapshotLength, setSnapshotLength] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
 
   const isLogin = useAppSelector((state) => state.auth.isLogin);
@@ -64,9 +63,9 @@ const Post = () => {
         posts[doc.id] = { id: doc.id, ...doc.data() };
       });
 
-      if (querySnapshot && setLastPostKey && setFirstPostKey) {
-        setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        setFirstPostKey(querySnapshot.docs[0]);
+      if (querySnapshot) {
+        setLastPostKey?.(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setFirstPostKey?.(querySnapshot.docs[0]);
       }
 
       return posts;
@@ -103,9 +102,9 @@ const Post = () => {
       return;
     }
 
-    if (querySnapshot && setLastPostKey && setFirstPostKey) {
-      setLastPostKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setFirstPostKey(querySnapshot.docs[0]);
+    if (querySnapshot) {
+      setLastPostKey?.(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setFirstPostKey?.(querySnapshot.docs[0]);
     }
 
     return posts;
