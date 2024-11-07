@@ -69,8 +69,6 @@ const Post = () => {
         setFirstPostKey(querySnapshot.docs[0]);
       }
 
-      setSnapshotLength(querySnapshot.docs.length);
-
       return posts;
     }
   });
@@ -80,10 +78,6 @@ const Post = () => {
   // prev, next 각각
   const loadMore = async (isNext: boolean) => {
     if (!lastPostKey || !firstPostKey) {
-      return;
-    }
-
-    if (snapshotLength < 6) {
       return;
     }
 
@@ -114,8 +108,6 @@ const Post = () => {
       setFirstPostKey(querySnapshot.docs[0]);
     }
 
-    setSnapshotLength(querySnapshot.docs.length);
-
     return posts;
   };
 
@@ -132,7 +124,7 @@ const Post = () => {
   };
 
   const loadPosts = async (value: string) => {
-    const isNext = value === 'prev' ? false : true;
+    const isNext = value === 'next' ? true : false;
 
     const morePost = await loadMore(isNext);
 

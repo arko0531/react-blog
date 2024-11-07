@@ -1,12 +1,13 @@
 import Button from 'components/ui/button/Button';
 import styled from 'styled-components';
+import { PostProps } from 'types/post-interface';
 
 const Pagination = ({
   onPrevClick,
   onNextClick,
   prevDisabled,
   nextDisabled
-}) => {
+}: PostProps) => {
   return (
     <PaginationWrapper>
       <Button

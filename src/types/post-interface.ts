@@ -1,4 +1,5 @@
-import { QueryDocumentSnapshot } from 'firebase/firestore';
+import { DocumentReference, QueryDocumentSnapshot } from 'firebase/firestore';
+import { StorageReference } from 'firebase/storage';
 
 export interface PostInfo {
   title: string;
@@ -11,11 +12,16 @@ export interface PostInfo {
 }
 
 export interface PostProps {
-  posts: PostInfo[];
+  posts?: PostInfo[];
   onPrevClick: () => void;
   onNextClick: () => void;
   prevDisabled: boolean;
   nextDisabled: boolean;
+}
+
+export interface DetailPostInfo {
+  postDoc: DocumentReference;
+  imageRef: StorageReference;
 }
 
 export interface SearchInfo {
