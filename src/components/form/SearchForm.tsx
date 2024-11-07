@@ -12,7 +12,7 @@ const SearchForm = ({ onSearchPost, onSearchChange, search }: SearchInfo) => {
         onChange={onSearchChange}
         value={search}
       />
-      <Button type="submit" $width={60}>
+      <Button type="submit" $width="60px">
         검색
       </Button>
     </SearchFormWrapper>

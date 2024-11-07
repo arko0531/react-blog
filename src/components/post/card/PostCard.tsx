@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPostingDate } from 'util/dateFormat';
 import { PostInfo } from 'types/post-interface';
 
-const PostCard = ({ post }: { key: string; post: PostInfo }) => {
+const PostCard = ({ post }: { post: PostInfo }) => {
   const navigate = useNavigate();
 
   return (

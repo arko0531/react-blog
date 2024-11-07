@@ -13,9 +13,7 @@ const PostList = ({
   return (
     <Container>
       <PostListWrapper>
-        {posts!.map((post) => (
-          <PostCard key={post.postId} post={post} />
-        ))}
+        {posts?.map((post) => <PostCard key={post.postId} post={post} />)}
       </PostListWrapper>
 
       <Pagination

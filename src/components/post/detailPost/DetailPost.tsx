@@ -22,7 +22,7 @@ import {
 import Button from 'components/ui/button/Button';
 import Modal from 'components/modal/Modal';
 import DetailPostBox from 'components/post/detailPost/DetailPostBox';
-import { DetailPostInfo } from 'types/post-interface';
+import { DetailPostInfo, PostInfo } from 'types/post-interface';
 
 const DetailPost = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -91,10 +91,10 @@ const DetailPost = () => {
       <ButtonWrapper>
         {isLogin && user?.email === data?.userEmail && (
           <>
-            <Button $width={70} onClick={handleEdit}>
+            <Button $width="70px" onClick={handleEdit}>
               Edit
             </Button>
-            <Button $width={70} $bgColor="white" onClick={openModal}>
+            <Button $width="70px" $bgColor="white" onClick={openModal}>
               Delete
             </Button>
           </>

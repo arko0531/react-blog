@@ -29,7 +29,7 @@ const Post = () => {
     lastPostKey,
     setLastPostKey
   }: SearchProps = useOutletContext();
-  const [page, setPage] = useState<number>(1);
+  const [page, setPage] = useState<number>(0);
   const [totalCount, setTotalCount] = useState<number>(0);
 
   const isLogin = useAppSelector((state) => state.auth.isLogin);
@@ -123,7 +123,7 @@ const Post = () => {
   };
 
   const loadPosts = async (value: string) => {
-    const isNext = value === 'next' ? true : false;
+    const isNext = value === 'next';
 
     const morePost = await loadMore(isNext);
 

@@ -177,8 +177,8 @@ const PostForm = () => {
         <TextArea
           label="내용"
           id="content"
-          $width="100%"
-          $height="400px"
+          width="100%"
+          height="400px"
           placeholder="내용을 입력해주세요."
           // defaultValue={postData?.content || ''}
           value={post.content}

@@ -1,6 +1,6 @@
 export interface ButtonProps {
   $color?: string;
-  $width?: number;
+  $width?: string;
   $bgColor?: string;
   $disabled?: boolean;
   [property: string]: any;

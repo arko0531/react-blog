@@ -1,21 +1,20 @@
-import React from 'react';
 import styled from 'styled-components';
 import { ButtonProps } from 'types/ui-interface';
 
 const Button = ({
   children,
-  $color,
-  $width,
-  $bgColor,
-  $disabled,
+  color,
+  width,
+  bgColor,
+  disabled,
   ...props
 }: ButtonProps) => {
   return (
     <StyledButton
-      $color={$color}
-      $width={$width}
-      $bgColor={$bgColor}
-      $disabled={$disabled}
+      $color={color}
+      $width={width}
+      $bgColor={bgColor}
+      $disabled={disabled}
       {...props}
     >
       {children}
@@ -25,10 +24,15 @@ const Button = ({
 
 export default Button;
 
-const StyledButton = styled.button<ButtonProps>`
+const StyledButton = styled.button<{
+  $width: string;
+  $bgColor: string;
+  $color: string;
+  $disabled: boolean;
+}>`
   background-color: ${({ $bgColor, $disabled }) =>
     $bgColor ? $bgColor : $disabled ? '#d9d9d9f8' : '#ffdd1ef9'};
-  width: ${({ $width }) => ($width ? `${$width}px` : '100px')};
+  width: ${({ $width }) => ($width ? `${$width}` : '100px')};
   color: ${({ $color }) => ($color ? `${$color}` : 'black')};
   border-radius: 10px;
   height: 40px;

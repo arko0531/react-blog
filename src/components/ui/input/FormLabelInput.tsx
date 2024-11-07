@@ -1,19 +1,18 @@
 import Input from 'components/ui/input/Input';
-import React from 'react';
 import styled from 'styled-components';
 import { FormLabelInputProps } from 'types/ui-interface';
 
 const FormLabelInput = ({
   label,
   id,
-  $width,
-  $height,
+  width,
+  height,
   ...props
 }: FormLabelInputProps) => {
   return (
     <FormInputLabelWrapper>
       <FormLabel htmlFor={id}>{label}</FormLabel>
-      <Input id={id} $width={$width} $height={$height} {...props} />
+      <Input id={id} $width={width} $height={height} {...props} />
     </FormInputLabelWrapper>
   );
 };
