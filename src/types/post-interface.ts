@@ -4,7 +4,7 @@ import { StorageReference } from 'firebase/storage';
 export interface PostInfo {
   title: string;
   content: string;
-  userEmail: string | null;
+  userEmail: string;
   postId: string;
   imageURL: string;
   imageName: string;

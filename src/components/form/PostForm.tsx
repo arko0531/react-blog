@@ -130,9 +130,9 @@ const PostForm = () => {
 
     const imageName: string = fileName; // 이름
 
-    const title: string = post.title!;
-    const content: string = post.content!;
-    const userEmail: string | null = user.email;
+    const title: string = post.title;
+    const content: string = post.content;
+    const userEmail: string = user.email!;
     const postId: string = params.postId ? params.postId : uuidv4();
     const timeStamp: number = Number(new Date());
 

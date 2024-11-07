@@ -1,4 +1,3 @@
-import React from 'react';
 import Post from 'components/post/postList/Post';
 
 const MainPostPage = () => {
